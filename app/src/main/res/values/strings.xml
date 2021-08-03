@@ -2,4 +2,6 @@
     <string name="app_name">NavigationAid</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="my_places">Meine Orte</string>
+    <string name="take_quiz">Quiz nehmen</string>
 </resources>
