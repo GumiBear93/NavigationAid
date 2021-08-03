@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.navigationaid.databinding.FragmentHomeBinding
 
 
@@ -18,6 +19,19 @@ class HomeFragment : Fragment() {
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //take user to List of Places in PlacesFragment
+        binding.myPlaces.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_placesFragment)
+        }
+
+        //take user to take Quiz in QuizContainerFragment
+        binding.takeQuiz.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_quizContainerFragment)
+        }
     }
 
     override fun onDestroyView() {
