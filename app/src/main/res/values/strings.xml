@@ -6,4 +6,12 @@
     <string name="take_quiz">Quiz nehmen</string>
     <string name="hint">Hilfestellung</string>
     <string name="add_new_place">neuen Ort hinzufügen</string>
+    <string name="place_name_req">Name des Ortes <font color='#FF0000'>*</font></string>
+    <string name="open_camera">Kamera</string>
+    <string name="open_gallery">Gallerie</string>
+    <string name="choose_place">Ort auswählen <font color='#FF0000'>*</font></string>
+    <string name="open_map">Karte öffnen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="done">Fertig</string>
+    <string name="content_desc_place_preview">Vorschau für Ort</string>
 </resources>

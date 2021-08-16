@@ -1,10 +1,12 @@
 package com.example.navigationaid
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
 class PlacesAdapter :
@@ -31,13 +33,27 @@ class PlacesAdapter :
         return PlaceViewHolder(layout)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         if (position >= placesList.size) {
             holder.textView.setText(R.string.add_new_place)
             holder.imageView.setImageResource(R.drawable.ic_baseline_add_circle_24)
+            //clicking last element will open editor for new place
+            holder.imageView.setOnClickListener {
+                it.findNavController().navigate(R.id.action_placesFragment_to_placeEditorFragment)
+            }
         } else {
             holder.textView.text = "Sample Text"
             holder.imageView.setImageResource(R.drawable.ic_launcher_foreground)
+            //clicking will open list of routes
+            holder.imageView.setOnClickListener {
+                it.findNavController().navigate(R.id.action_placesFragment_to_routesFragment)
+            }
+            //long clicking will open editor of clicked place
+            holder.imageView.setOnLongClickListener {
+                it.findNavController().navigate(R.id.action_placesFragment_to_placeEditorFragment)
+                true
+            }
         }
     }
 }

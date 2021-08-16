@@ -46,6 +46,18 @@ dependencies {
     // Feature module Support
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
 
+    // Room
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+
+    //osmBonusPack
+    implementation files('libs/osmbonuspack_6.7.0.aar')
+    implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
 

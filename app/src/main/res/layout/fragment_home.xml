@@ -11,7 +11,7 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/my_places"
+            android:id="@+id/button_my_places"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -23,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <Button
-            android:id="@+id/take_quiz"
+            android:id="@+id/button_take_quiz"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
             android:minWidth="@dimen/button_width"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/my_places"/>
+            app:layout_constraintTop_toBottomOf="@id/button_my_places"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
