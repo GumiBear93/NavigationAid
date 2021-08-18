@@ -31,6 +31,12 @@ class PlacesFragment : Fragment() {
         findNavController().navigate(R.id.action_placesFragment_to_placeEditorFragment)
     }
 
+    fun editPlace() {
+        val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(
+
+        )
+    }
+
     fun choosePlace() {
         findNavController().navigate(R.id.action_placesFragment_to_routesFragment)
     }

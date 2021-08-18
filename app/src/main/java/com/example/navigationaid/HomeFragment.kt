@@ -24,12 +24,12 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //take user to List of Places in PlacesFragment
-        binding.myPlaces.setOnClickListener {
+        binding.buttonMyPlaces.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_placesFragment)
         }
 
         //take user to take Quiz in QuizContainerFragment
-        binding.takeQuiz.setOnClickListener {
+        binding.buttonTakeQuiz.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_quizContainerFragment)
         }
     }

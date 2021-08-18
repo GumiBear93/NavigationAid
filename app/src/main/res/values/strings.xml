@@ -14,4 +14,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="done">Fertig</string>
     <string name="content_desc_place_preview">Vorschau für Ort</string>
+    <string name="camera_error">Kamera Fehler</string>
+    <string name="permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
+    <string name="choose_image">Wähle ein Bild</string>
 </resources>

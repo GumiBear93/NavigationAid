@@ -20,7 +20,6 @@ class PlacesAdapter :
         val textView = view.findViewById<TextView>(R.id.textView)
         //image of place
         val imageView = view.findViewById<ImageView>(R.id.imageView)
-        //if last item in list, it can be clicked to add new place
     }
 
     override fun getItemCount(): Int {
@@ -29,7 +28,7 @@ class PlacesAdapter :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceViewHolder {
-        val layout = LayoutInflater.from(parent.context).inflate(R.layout.route_item_view, parent, false)
+        val layout = LayoutInflater.from(parent.context).inflate(R.layout.place_item_view, parent, false)
         return PlaceViewHolder(layout)
     }
 

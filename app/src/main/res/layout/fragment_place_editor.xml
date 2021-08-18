@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin">
+        android:padding="@dimen/padding">
 
         <ImageView
             android:id="@+id/image_preview"
@@ -18,6 +18,7 @@
             android:layout_margin="@dimen/margin_between_elements"
             android:scaleType="centerCrop"
             android:contentDescription="@string/content_desc_place_preview"
+            app:layout_constraintHeight_max="240dp"
             app:layout_constraintDimensionRatio="H,1:1"
             app:layout_constraintEnd_toStartOf="@id/layout_image_buttons"
             app:layout_constraintHorizontal_weight="2"
@@ -64,7 +65,7 @@
             app:layout_constraintTop_toBottomOf="@id/image_preview">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/item_name"
+                android:id="@+id/place_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textAutoComplete|textCapWords"
