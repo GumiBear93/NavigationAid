@@ -24,30 +24,34 @@ class PlaceEditorFragment : Fragment() {
     private var _binding: FragmentPlaceEditorBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: NavigationViewModel by activityViewModels {
+    private val sharedViewModel: NavigationViewModel by activityViewModels {
         NavigationViewModelFactory(
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 
+    // call ViewModel function to validate user input
+    // name is only part of the UI that is not saved in ViewModel
     private fun isEntryValid(): Boolean {
-        return viewModel.isEntryValid(
+        return sharedViewModel.isEntryValid(
             binding.placeName.text.toString()
         )
     }
 
+    // confirm user input, call ViewModel functions to save input to database, navigate back
     private fun addNewPlaceItem() {
         if (isEntryValid()) {
-            viewModel.addNewPlaceItem(
+            sharedViewModel.addNewPlaceItem(
                 requireContext(),
                 binding.placeName.text.toString()
             )
-            viewModel.resetUserInput()
+            sharedViewModel.resetUserInput()
             val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
             findNavController().navigate(action)
         }
     }
 
+    // ask for camera permission and create intent to start camera
     private fun openCamera() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -65,6 +69,7 @@ class PlaceEditorFragment : Fragment() {
         }
     }
 
+    // create intent to open gallery for user to choose image
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
@@ -74,17 +79,27 @@ class PlaceEditorFragment : Fragment() {
         )
     }
 
+    // update preview image (called by observer)
     private fun displayImage() {
-        val imageFile = viewModel.placeImage.value
-        if (imageFile !== null) {
-            binding.imagePreview.setImageBitmap(imageFile)
+        if (sharedViewModel.placeImage.value !== null) {
+            binding.imagePreview.setImageBitmap(sharedViewModel.placeImage.value!!)
         } else {
             binding.imagePreview.setImageResource(R.drawable.home)
         }
     }
 
+    // change the hint's text when the user selected a location
+    private fun updateLocationHint() {
+        if (sharedViewModel.placePoint.value == null) {
+            binding.textViewMap.setText(R.string.choose_place)
+        } else {
+            binding.textViewMap.setText(R.string.place_chosen)
+        }
+    }
+
+    // reset viewModel input after user presses "abort"
     private fun cancelUserInput() {
-        viewModel.resetUserInput()
+        sharedViewModel.resetUserInput()
         val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
         findNavController().navigate(action)
     }
@@ -97,10 +112,10 @@ class PlaceEditorFragment : Fragment() {
         return binding.root
     }
 
+
+    // bind buttons and set observers to image/ location data to update UI
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        displayImage()
 
         binding.buttonCamera.setOnClickListener {
             openCamera()
@@ -114,24 +129,28 @@ class PlaceEditorFragment : Fragment() {
         binding.buttonCancel.setOnClickListener {
             cancelUserInput()
         }
-        viewModel.placeImage.observe(viewLifecycleOwner,
+        binding.buttonMap.setOnClickListener {
+            val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment()
+            findNavController().navigate(action)
+        }
+        sharedViewModel.placeImage.observe(viewLifecycleOwner,
             {
                 displayImage()
             })
+        sharedViewModel.placePoint.observe(viewLifecycleOwner,
+            {
+                updateLocationHint()
+            })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.resetUserInput()
-    }
-
+    // receives chosen image file after camera/ gallery intent
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CAMERA_REQUEST_CODE) {
                 val thumbnail: Bitmap? = data?.extras?.get("data") as Bitmap?
                 if (thumbnail != null) {
-                    viewModel.prepareImage(thumbnail)
+                    sharedViewModel.prepareImage(thumbnail)
                 }
             } else if (requestCode == GALLERY_REQUEST_CODE) {
                 val imageUri: Uri? = data?.data
@@ -140,12 +159,13 @@ class PlaceEditorFragment : Fragment() {
                         requireContext().contentResolver,
                         imageUri
                     )
-                    viewModel.prepareImage(thumbnail)
+                    sharedViewModel.prepareImage(thumbnail)
                 }
             }
         }
     }
 
+    // handles action after user has been asked for Camera Permission
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

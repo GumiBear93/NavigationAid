@@ -11,10 +11,13 @@
     <string name="open_gallery">Gallerie</string>
     <string name="choose_place">Ort auswählen <font color='#FF0000'>*</font></string>
     <string name="open_map">Karte öffnen</string>
+    <string name="place_chosen">Ort ausgewählt</string>
     <string name="cancel">Abbrechen</string>
     <string name="done">Fertig</string>
     <string name="content_desc_place_preview">Vorschau für Ort</string>
     <string name="camera_error">Kamera Fehler</string>
     <string name="permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
     <string name="choose_image">Wähle ein Bild</string>
+    <string name="location_disabled">Standort nicht aktiviert</string>
+    <string name="content_desc_find_location">Standort finden</string>
 </resources>

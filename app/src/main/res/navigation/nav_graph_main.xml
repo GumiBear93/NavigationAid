@@ -39,6 +39,9 @@
             app:destination="@id/placesFragment"
             app:popUpTo="@id/placesFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_placeEditorFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
     <fragment
         android:id="@+id/quizContainerFragment"
@@ -58,5 +61,16 @@
         <action
             android:id="@+id/action_routesFragment_to_routeOverviewFragment"
             app:destination="@id/routeOverviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.navigationaid.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_mapFragment_to_placeEditorFragment"
+            app:destination="@id/placeEditorFragment"
+            app:popUpTo="@id/placeEditorFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

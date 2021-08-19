@@ -16,7 +16,8 @@ import java.util.*
 const val LOG_TAG = "NavViewModel"
 
 class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
-    private var _placePoint: GeoPoint? = null
+    private var _placePoint: MutableLiveData<GeoPoint?> = MutableLiveData(null)
+    val placePoint: LiveData<GeoPoint?> get() = _placePoint
 
     private val _placeImage: MutableLiveData<Bitmap?> = MutableLiveData(null)
     val placeImage: LiveData<Bitmap?> get() = _placeImage
@@ -49,14 +50,14 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     fun addNewPlaceItem(context: Context, placeItemName: String) {
         saveImage(context)
         if (_placeImageName != null) {
-            val newPlaceItem = getNewPlaceItemEntry(placeItemName, _placePoint!!, _placeImageName!!)
+            val newPlaceItem = getNewPlaceItemEntry(placeItemName, _placePoint.value!!, _placeImageName!!)
             insertPlaceItem(newPlaceItem)
         }
     }
 
     // checks for filled-in name of place, image and geoPoint
     fun isEntryValid(placeItemName: String): Boolean {
-        if (placeItemName.isBlank() || _placeImage.value == null || _placePoint == null) {
+        if (placeItemName.isBlank() || _placeImage.value == null || _placePoint.value == null) {
             return false
         }
         return true
@@ -64,13 +65,18 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
 
     // resets ViewModel properties if Input is canceled
     fun resetUserInput() {
-        _placePoint = null
+        _placePoint.value = null
         _placeImage.value = null
         _placeImageName = null
     }
 
+    // update chosen preview image as variable
     fun prepareImage(image: Bitmap) {
         _placeImage.value = image
+    }
+
+    fun setUserLocation(locationPoint: GeoPoint) {
+        _placePoint.value = locationPoint
     }
 
     //attempts to save image to private app location
