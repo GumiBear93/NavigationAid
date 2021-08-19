@@ -97,6 +97,13 @@ class PlaceEditorFragment : Fragment() {
         }
     }
 
+    // save name when navigating into Map, Camera or Gallery
+    private fun storeTextInput() {
+        if (binding.placeName.text.toString().isNotEmpty()) {
+            sharedViewModel.setPlaceName(binding.placeName.text.toString())
+        }
+    }
+
     // reset viewModel input after user presses "abort"
     private fun cancelUserInput() {
         sharedViewModel.resetUserInput()
@@ -117,30 +124,45 @@ class PlaceEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.buttonCamera.setOnClickListener {
-            openCamera()
+        binding.apply {
+            buttonCamera.setOnClickListener {
+                storeTextInput()
+                openCamera()
+            }
+            buttonGallery.setOnClickListener {
+                storeTextInput()
+                openGallery()
+            }
+            buttonMap.setOnClickListener {
+                storeTextInput()
+                val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment()
+                findNavController().navigate(action)
+            }
+            buttonConfirm.setOnClickListener {
+                addNewPlaceItem()
+            }
+            buttonCancel.setOnClickListener {
+                cancelUserInput()
+            }
         }
-        binding.buttonGallery.setOnClickListener {
-            openGallery()
+
+        sharedViewModel.apply {
+            placeImage.observe(viewLifecycleOwner,
+                {
+                    displayImage()
+                })
+            placePoint.observe(viewLifecycleOwner,
+                {
+                    updateLocationHint()
+                })
         }
-        binding.buttonConfirm.setOnClickListener {
-            addNewPlaceItem()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (sharedViewModel.placeName.value.toString().isNotEmpty()) {
+            binding.placeName.setText(sharedViewModel.placeName.value)
         }
-        binding.buttonCancel.setOnClickListener {
-            cancelUserInput()
-        }
-        binding.buttonMap.setOnClickListener {
-            val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment()
-            findNavController().navigate(action)
-        }
-        sharedViewModel.placeImage.observe(viewLifecycleOwner,
-            {
-                displayImage()
-            })
-        sharedViewModel.placePoint.observe(viewLifecycleOwner,
-            {
-                updateLocationHint()
-            })
     }
 
     // receives chosen image file after camera/ gallery intent
@@ -150,7 +172,7 @@ class PlaceEditorFragment : Fragment() {
             if (requestCode == CAMERA_REQUEST_CODE) {
                 val thumbnail: Bitmap? = data?.extras?.get("data") as Bitmap?
                 if (thumbnail != null) {
-                    sharedViewModel.prepareImage(thumbnail)
+                    sharedViewModel.setPlaceImage(thumbnail)
                 }
             } else if (requestCode == GALLERY_REQUEST_CODE) {
                 val imageUri: Uri? = data?.data
@@ -159,7 +181,7 @@ class PlaceEditorFragment : Fragment() {
                         requireContext().contentResolver,
                         imageUri
                     )
-                    sharedViewModel.prepareImage(thumbnail)
+                    sharedViewModel.setPlaceImage(thumbnail)
                 }
             }
         }

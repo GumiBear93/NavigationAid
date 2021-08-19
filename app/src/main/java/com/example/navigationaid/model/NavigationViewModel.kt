@@ -16,6 +16,9 @@ import java.util.*
 const val LOG_TAG = "NavViewModel"
 
 class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
+    private var _placeName: MutableLiveData<String?> = MutableLiveData(null)
+    val placeName: LiveData<String?> get() = _placeName
+
     private var _placePoint: MutableLiveData<GeoPoint?> = MutableLiveData(null)
     val placePoint: LiveData<GeoPoint?> get() = _placePoint
 
@@ -67,16 +70,21 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     fun resetUserInput() {
         _placePoint.value = null
         _placeImage.value = null
+        _placeName.value = null
         _placeImageName = null
     }
 
-    // update chosen preview image as variable
-    fun prepareImage(image: Bitmap) {
+    fun setPlaceImage(image: Bitmap) {
         _placeImage.value = image
     }
 
-    fun setUserLocation(locationPoint: GeoPoint) {
-        _placePoint.value = locationPoint
+
+    fun setPlacePoint(point: GeoPoint) {
+        _placePoint.value = point
+    }
+
+    fun setPlaceName(name: String) {
+        _placeName.value = name
     }
 
     //attempts to save image to private app location

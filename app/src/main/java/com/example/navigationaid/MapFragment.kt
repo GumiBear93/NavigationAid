@@ -96,7 +96,7 @@ class MapFragment : Fragment() {
     // save location and navigate back
     private fun confirmLocation() {
         val finalLocation = GeoPoint(map.mapCenter)
-        sharedViewModel.setUserLocation(finalLocation)
+        sharedViewModel.setPlacePoint(finalLocation)
         val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment()
         findNavController().navigate(action)
     }
@@ -138,14 +138,16 @@ class MapFragment : Fragment() {
         locationManager =
             requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        binding.fabMyLocation.setOnClickListener {
-            setLocationAsUserLocation()
-        }
-        binding.buttonConfirm.setOnClickListener {
-            confirmLocation()
-        }
-        binding.buttonCancel.setOnClickListener {
-            cancelUserInput()
+        binding.apply {
+            fabMyLocation.setOnClickListener {
+                setLocationAsUserLocation()
+            }
+            buttonConfirm.setOnClickListener {
+                confirmLocation()
+            }
+            buttonCancel.setOnClickListener {
+                cancelUserInput()
+            }
         }
     }
 
