@@ -9,6 +9,7 @@ import com.example.navigationaid.data.ItemDao
 import com.example.navigationaid.data.PlaceItem
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -16,6 +17,9 @@ import java.util.*
 const val LOG_TAG = "NavViewModel"
 
 class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
+
+    val allPlaceItems: LiveData<List<PlaceItem>> = itemDao.getPlaceItems().asLiveData()
+
     private var _placeName: MutableLiveData<String?> = MutableLiveData(null)
     val placeName: LiveData<String?> get() = _placeName
 
@@ -34,16 +38,62 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
         }
     }
 
-    // creates PlaceItem
+    // retrieves PlaceItem from the Database
+    fun retrieveItem(id: Int): LiveData<PlaceItem> {
+        return itemDao.getPlaceItem(id).asLiveData()
+    }
+
+    // update PlaceItem in the Database
+    private fun updatePlaceItem(
+        placeItem: PlaceItem
+    ) {
+        viewModelScope.launch {
+            itemDao.update(placeItem)
+        }
+    }
+
+    // swaps preview images, create new and updated placeItem, call function to update in Database
+    fun updatePlaceItem(
+        context: Context,
+        oldPlaceItem: PlaceItem,
+        placeItemName: String
+    ) {
+        deleteImage(context, oldPlaceItem.imageName)
+        saveImage(context)
+        val updatedPlaceItem = getUpdatedItemEntry(
+            oldPlaceItem.id,
+            placeItemName,
+            _placePoint.value!!,
+            _placeImageName!!
+        )
+        updatePlaceItem(updatedPlaceItem)
+    }
+
+    // creates and returns PlaceItem
     private fun getNewPlaceItemEntry(
         placeItemName: String,
-        placePoint: GeoPoint,
+        placeItemPoint: GeoPoint,
         placeImageName: String
     ): PlaceItem {
         return PlaceItem(
             name = placeItemName,
-            point = placePoint.toString(),
+            point = placeItemPoint.toString(),
             imageName = placeImageName
+        )
+    }
+
+    // updates and returns PlaceItem
+    private fun getUpdatedItemEntry(
+        placeItemId: Int,
+        placeItemName: String,
+        placeItemPoint: GeoPoint,
+        placeItemImageName: String
+    ): PlaceItem {
+        return PlaceItem(
+            id = placeItemId,
+            name = placeItemName,
+            point = placeItemPoint.toString(),
+            imageName = placeItemImageName
         )
     }
 
@@ -53,7 +103,8 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     fun addNewPlaceItem(context: Context, placeItemName: String) {
         saveImage(context)
         if (_placeImageName != null) {
-            val newPlaceItem = getNewPlaceItemEntry(placeItemName, _placePoint.value!!, _placeImageName!!)
+            val newPlaceItem =
+                getNewPlaceItemEntry(placeItemName, _placePoint.value!!, _placeImageName!!)
             insertPlaceItem(newPlaceItem)
         }
     }
@@ -78,6 +129,9 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
         _placeImage.value = image
     }
 
+    fun setPlaceImageName(imageName: String) {
+        _placeImageName = imageName
+    }
 
     fun setPlacePoint(point: GeoPoint) {
         _placePoint.value = point
@@ -87,7 +141,7 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
         _placeName.value = name
     }
 
-    //attempts to save image to private app location
+    // attempts to save image to private app location
     @SuppressLint("SimpleDateFormat")
     private fun saveImage(context: Context) {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -101,9 +155,18 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
             Log.d(LOG_TAG, e.toString())
         }
     }
+
+    // attempts to delete old image to make room for updated image
+    private fun deleteImage(context: Context, fileName: String) {
+        val file = File(context.filesDir, fileName)
+        if (file.exists()) {
+            file.delete()
+        }
+    }
 }
 
-class NavigationViewModelFactory(private val itemDao: ItemDao) : ViewModelProvider.Factory {
+class NavigationViewModelFactory(private val itemDao: ItemDao) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(NavigationViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

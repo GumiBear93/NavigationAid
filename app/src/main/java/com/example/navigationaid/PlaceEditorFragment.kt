@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +18,20 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.example.navigationaid.data.PlaceItem
+import com.example.navigationaid.data.toGeoPoint
 import com.example.navigationaid.databinding.FragmentPlaceEditorBinding
 import com.example.navigationaid.model.NavigationViewModel
 import com.example.navigationaid.model.NavigationViewModelFactory
+import java.io.File
 
 class PlaceEditorFragment : Fragment() {
     private var _binding: FragmentPlaceEditorBinding? = null
     private val binding get() = _binding!!
+
+    lateinit var placeItem: PlaceItem
+    private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
 
     private val sharedViewModel: NavigationViewModel by activityViewModels {
         NavigationViewModelFactory(
@@ -44,6 +53,20 @@ class PlaceEditorFragment : Fragment() {
             sharedViewModel.addNewPlaceItem(
                 requireContext(),
                 binding.placeName.text.toString()
+            )
+            sharedViewModel.resetUserInput()
+            val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
+            findNavController().navigate(action)
+        }
+    }
+
+    // confirm user input, call ViewModel functions to update PlaceItem in database, navigate back
+    private fun updatePlaceItem() {
+        if (isEntryValid()) {
+            sharedViewModel.updatePlaceItem(
+                requireContext(),
+                this.placeItem,
+                this.binding.placeName.text.toString()
             )
             sharedViewModel.resetUserInput()
             val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
@@ -104,6 +127,27 @@ class PlaceEditorFragment : Fragment() {
         }
     }
 
+    // binding all known PlaceItem properties to UI and prepare to edit item
+    private fun bindItem(placeItem: PlaceItem) {
+        val file = File(requireContext().filesDir, placeItem.imageName)
+        val image: Bitmap? = try {
+            BitmapFactory.decodeFile(file.path)
+        } catch (e: Exception) {
+            Log.d("PlaceAdapter", "bind: Error reading image")
+            null
+        }
+
+        sharedViewModel.apply {
+            setPlacePoint(placeItem.point.toGeoPoint())
+            setPlaceImageName(placeItem.imageName)
+            if (image != null) {
+                setPlaceImage(image)
+            }
+        }
+
+        binding.placeName.setText(placeItem.name)
+    }
+
     // reset viewModel input after user presses "abort"
     private fun cancelUserInput() {
         sharedViewModel.resetUserInput()
@@ -119,10 +163,69 @@ class PlaceEditorFragment : Fragment() {
         return binding.root
     }
 
-
     // bind buttons and set observers to image/ location data to update UI
+    // change functionality to editing if id was passed through navArgs
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedViewModel.apply {
+            placeImage.observe(viewLifecycleOwner,
+                {
+                    displayImage()
+                })
+            placePoint.observe(viewLifecycleOwner,
+                {
+                    updateLocationHint()
+                })
+        }
+
+        // I am extremely sorry for the following lines of code
+        // this is the only way i could think of to cover all cases of user navigation
+        // please don't hurt me, writing this has hurt enough
+
+        val id = navigationArgs.itemId
+        val placePointString = navigationArgs.selectedGeopoint
+
+        // user is editing a PlaceItem
+        if (id > 0) {
+            binding.buttonConfirm.setOnClickListener {
+                updatePlaceItem()
+            }
+
+            // user just entered PlaceEditor
+            if (placePointString == null) {
+                sharedViewModel.retrieveItem(id).observe(this.viewLifecycleOwner) { selectedItem ->
+                    placeItem = selectedItem
+                    bindItem(placeItem)
+                }
+            }
+            // user selected new GeoPoint while editing PlaceItem
+            else {
+                sharedViewModel.retrieveItem(id).observe(this.viewLifecycleOwner) { selectedItem ->
+                    placeItem = selectedItem
+                }
+                sharedViewModel.setPlacePoint(placePointString.toGeoPoint())
+
+            }
+        }
+        // user is adding a new PlaceItem
+        else {
+            binding.buttonConfirm.setOnClickListener {
+                addNewPlaceItem()
+            }
+
+            // user just entered PlaceEditor or comes back from Map without saving location
+            if (placePointString == null) {
+                // user entered PlaceEditor from Places List
+                if (id != MapFragment.CANCEL_MAP_NAVIGATION_CODE) {
+                    sharedViewModel.resetUserInput()
+                }
+            }
+            // user selected a new GeoPoint for new PlaceItem
+            else {
+                sharedViewModel.setPlacePoint(placePointString.toGeoPoint())
+            }
+        }
 
         binding.apply {
             buttonCamera.setOnClickListener {
@@ -135,29 +238,16 @@ class PlaceEditorFragment : Fragment() {
             }
             buttonMap.setOnClickListener {
                 storeTextInput()
-                val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment()
+                val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment(id)
                 findNavController().navigate(action)
-            }
-            buttonConfirm.setOnClickListener {
-                addNewPlaceItem()
             }
             buttonCancel.setOnClickListener {
                 cancelUserInput()
             }
         }
-
-        sharedViewModel.apply {
-            placeImage.observe(viewLifecycleOwner,
-                {
-                    displayImage()
-                })
-            placePoint.observe(viewLifecycleOwner,
-                {
-                    updateLocationHint()
-                })
-        }
     }
 
+    // repopulate text input if returning from camera, gallery or map
     override fun onResume() {
         super.onResume()
         if (sharedViewModel.placeName.value.toString().isNotEmpty()) {

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentMapBinding
 import com.example.navigationaid.model.NavigationViewModel
 import com.example.navigationaid.model.NavigationViewModelFactory
@@ -30,6 +31,8 @@ const val LOG_TAG = "MapFragment"
 class MapFragment : Fragment() {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
+
+    private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
 
     private val sharedViewModel: NavigationViewModel by activityViewModels {
         NavigationViewModelFactory(
@@ -93,17 +96,28 @@ class MapFragment : Fragment() {
         }
     }
 
-    // save location and navigate back
+    // navigate back and pass id of edited place plus new location
     private fun confirmLocation() {
-        val finalLocation = GeoPoint(map.mapCenter)
-        sharedViewModel.setPlacePoint(finalLocation)
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment()
+        val id = navigationArgs.itemId
+        val finalLocation = GeoPoint(map.mapCenter).toString()
+        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(id, finalLocation)
         findNavController().navigate(action)
     }
 
-    // navigate back without saving location
+    // navigate back and pass id of edited place without passing location
+    // let PlaceEditor know if Map input has been canceled as to not reset user input
     private fun cancelUserInput() {
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment()
+        val id = if (navigationArgs.itemId > 0) {
+            navigationArgs.itemId
+        } else {
+            CANCEL_MAP_NAVIGATION_CODE
+        }
+        val location = if (sharedViewModel.placePoint.value != null) {
+            sharedViewModel.placePoint.value.toString()
+        } else {
+            null
+        }
+        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(id, location)
         findNavController().navigate(action)
     }
 
@@ -152,6 +166,7 @@ class MapFragment : Fragment() {
     }
 
     companion object {
+        const val CANCEL_MAP_NAVIGATION_CODE = -2
         private const val FINE_LOCATION_PERMISSION_CODE = 1
         private const val COARSE_LOCATION_PERMISSION_CODE = 2
         private const val DETAIL_ZOOM = 20.0
