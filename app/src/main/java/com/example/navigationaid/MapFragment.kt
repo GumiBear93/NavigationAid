@@ -78,7 +78,7 @@ class MapFragment : Fragment() {
         var location: Location? = null
         val gpsEnabled: Boolean = try {
             locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                    && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                    || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         } catch (e: Exception) {
             Log.d(LOG_TAG, "setLocationAsUserLocation: $e")
             false
