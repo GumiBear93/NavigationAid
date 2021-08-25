@@ -6,8 +6,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.osmdroid.util.GeoPoint
 
-const val LOG_TAG = "PlaceItem"
-
 @Entity(tableName = "placeItem")
 data class PlaceItem (
     @PrimaryKey(autoGenerate = true)
@@ -28,7 +26,7 @@ fun String.toGeoPoint(): GeoPoint {
             point.latitude = pointList[0].toDouble()
             point.longitude = pointList[1].toDouble()
         } catch (e: Exception) {
-            Log.d(LOG_TAG, e.toString())
+            Log.d("toGeoPoint", e.toString())
         }
     }
     return point

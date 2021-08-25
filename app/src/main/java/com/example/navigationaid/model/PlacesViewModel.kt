@@ -14,9 +14,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val LOG_TAG = "NavViewModel"
-
-class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
+class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
 
     val allPlaceItems: LiveData<List<PlaceItem>> = itemDao.getPlaceItems().asLiveData()
 
@@ -39,7 +37,7 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 
     // retrieves PlaceItem from the Database
-    fun retrieveItem(id: Int): LiveData<PlaceItem> {
+    fun retrievePlaceItem(id: Int): LiveData<PlaceItem> {
         return itemDao.getPlaceItem(id).asLiveData()
     }
 
@@ -60,7 +58,7 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     ) {
         deleteImage(context, oldPlaceItem.imageName)
         saveImage(context)
-        val updatedPlaceItem = getUpdatedItemEntry(
+        val updatedPlaceItem = getUpdatedPlaceItemEntry(
             oldPlaceItem.id,
             placeItemName,
             _placePoint.value!!,
@@ -83,7 +81,7 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 
     // updates and returns PlaceItem
-    private fun getUpdatedItemEntry(
+    private fun getUpdatedPlaceItemEntry(
         placeItemId: Int,
         placeItemName: String,
         placeItemPoint: GeoPoint,
@@ -163,14 +161,18 @@ class NavigationViewModel(private val itemDao: ItemDao) : ViewModel() {
             file.delete()
         }
     }
+
+    companion object {
+        private const val LOG_TAG = "PlacesViewModel"
+    }
 }
 
-class NavigationViewModelFactory(private val itemDao: ItemDao) :
+class PlacesViewModelFactory(private val itemDao: ItemDao) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NavigationViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(PlacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return NavigationViewModel(itemDao) as T
+            return PlacesViewModel(itemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

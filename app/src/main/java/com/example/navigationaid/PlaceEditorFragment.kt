@@ -22,8 +22,8 @@ import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.data.PlaceItem
 import com.example.navigationaid.data.toGeoPoint
 import com.example.navigationaid.databinding.FragmentPlaceEditorBinding
-import com.example.navigationaid.model.NavigationViewModel
-import com.example.navigationaid.model.NavigationViewModelFactory
+import com.example.navigationaid.model.PlacesViewModel
+import com.example.navigationaid.model.PlacesViewModelFactory
 import java.io.File
 
 class PlaceEditorFragment : Fragment() {
@@ -33,8 +33,8 @@ class PlaceEditorFragment : Fragment() {
     lateinit var placeItem: PlaceItem
     private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
 
-    private val sharedViewModel: NavigationViewModel by activityViewModels {
-        NavigationViewModelFactory(
+    private val sharedViewModel: PlacesViewModel by activityViewModels {
+        PlacesViewModelFactory(
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
@@ -188,30 +188,39 @@ class PlaceEditorFragment : Fragment() {
 
         // user is editing a PlaceItem
         if (id > 0) {
-            binding.buttonConfirm.setOnClickListener {
-                updatePlaceItem()
+            binding.apply {
+                buttonConfirm.setOnClickListener {
+                    updatePlaceItem()
+                }
+                buttonDelete.visibility = View.VISIBLE
             }
+
 
             // user just entered PlaceEditor
             if (placePointString == null) {
-                sharedViewModel.retrieveItem(id).observe(this.viewLifecycleOwner) { selectedItem ->
-                    placeItem = selectedItem
-                    bindItem(placeItem)
-                }
+                sharedViewModel.retrievePlaceItem(id)
+                    .observe(this.viewLifecycleOwner) { selectedItem ->
+                        placeItem = selectedItem
+                        bindItem(placeItem)
+                    }
             }
             // user selected new GeoPoint while editing PlaceItem
             else {
-                sharedViewModel.retrieveItem(id).observe(this.viewLifecycleOwner) { selectedItem ->
-                    placeItem = selectedItem
-                }
+                sharedViewModel.retrievePlaceItem(id)
+                    .observe(this.viewLifecycleOwner) { selectedItem ->
+                        placeItem = selectedItem
+                    }
                 sharedViewModel.setPlacePoint(placePointString.toGeoPoint())
 
             }
         }
         // user is adding a new PlaceItem
         else {
-            binding.buttonConfirm.setOnClickListener {
-                addNewPlaceItem()
+            binding.apply {
+                buttonConfirm.setOnClickListener {
+                    addNewPlaceItem()
+                }
+                buttonDelete.visibility = View.GONE
             }
 
             // user just entered PlaceEditor or comes back from Map without saving location
@@ -238,7 +247,9 @@ class PlaceEditorFragment : Fragment() {
             }
             buttonMap.setOnClickListener {
                 storeTextInput()
-                val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment(id)
+                val title = navigationArgs.title
+                val action =
+                    PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment(id, title)
                 findNavController().navigate(action)
             }
             buttonCancel.setOnClickListener {
@@ -291,7 +302,7 @@ class PlaceEditorFragment : Fragment() {
             } else {
                 Toast.makeText(
                     requireContext(),
-                    getString(R.string.permission_required),
+                    getString(R.string.image_permission_required),
                     Toast.LENGTH_LONG
                 ).show()
             }

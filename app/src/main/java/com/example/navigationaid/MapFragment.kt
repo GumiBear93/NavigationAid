@@ -18,24 +18,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentMapBinding
-import com.example.navigationaid.model.NavigationViewModel
-import com.example.navigationaid.model.NavigationViewModelFactory
+import com.example.navigationaid.model.PlacesViewModel
+import com.example.navigationaid.model.PlacesViewModelFactory
 import org.osmdroid.api.IMapController
-import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-
-const val LOG_TAG = "MapFragment"
 
 class MapFragment : Fragment() {
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
 
-    private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
+    private val navigationArgs: MapFragmentArgs by navArgs()
 
-    private val sharedViewModel: NavigationViewModel by activityViewModels {
-        NavigationViewModelFactory(
+    private val sharedViewModel: PlacesViewModel by activityViewModels {
+        PlacesViewModelFactory(
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
@@ -92,15 +89,20 @@ class MapFragment : Fragment() {
             mapController.animateTo(GeoPoint(location))
             mapController.setZoom(DETAIL_ZOOM)
         } else {
-            Toast.makeText(requireContext(), getString(R.string.location_disabled), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.location_disabled),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     // navigate back and pass id of edited place plus new location
     private fun confirmLocation() {
         val id = navigationArgs.itemId
+        val title = navigationArgs.title
         val finalLocation = GeoPoint(map.mapCenter).toString()
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(id, finalLocation)
+        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, finalLocation)
         findNavController().navigate(action)
     }
 
@@ -112,12 +114,13 @@ class MapFragment : Fragment() {
         } else {
             CANCEL_MAP_NAVIGATION_CODE
         }
+        val title = navigationArgs.title
         val location = if (sharedViewModel.placePoint.value != null) {
             sharedViewModel.placePoint.value.toString()
         } else {
             null
         }
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(id, location)
+        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, location)
         findNavController().navigate(action)
     }
 
@@ -132,8 +135,6 @@ class MapFragment : Fragment() {
     // prepare map and location manager, bind buttons
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
         map = binding.map
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -167,6 +168,7 @@ class MapFragment : Fragment() {
 
     companion object {
         const val CANCEL_MAP_NAVIGATION_CODE = -2
+        private const val LOG_TAG = "MapFragment"
         private const val FINE_LOCATION_PERMISSION_CODE = 1
         private const val COARSE_LOCATION_PERMISSION_CODE = 2
         private const val DETAIL_ZOOM = 20.0

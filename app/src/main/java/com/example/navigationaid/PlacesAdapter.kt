@@ -14,7 +14,7 @@ import com.example.navigationaid.data.PlaceItem
 import com.example.navigationaid.databinding.PlaceItemViewBinding
 import java.io.File
 
-class PlacesAdapter(private val filesDir: File) : ListAdapter<PlaceItem, PlacesAdapter.PlaceViewHolder>(DiffCallback) {
+class PlacesAdapter(private val filesDir: File, private val title_add: String, private val title_edit: String) : ListAdapter<PlaceItem, PlacesAdapter.PlaceViewHolder>(DiffCallback) {
     override fun getItemCount(): Int {
         //return number of places plus one for adding new places
         return currentList.size + 1
@@ -38,7 +38,7 @@ class PlacesAdapter(private val filesDir: File) : ListAdapter<PlaceItem, PlacesA
 
             //clicking last element will open editor for new place
             holder.imageView.setOnClickListener {
-                val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment()
+                val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(title_add)
                 it.findNavController().navigate(action)
             }
         } else {
@@ -46,13 +46,13 @@ class PlacesAdapter(private val filesDir: File) : ListAdapter<PlaceItem, PlacesA
             holder.bind(current, filesDir)
 
             //clicking will open list of routes
-            holder.imageView.setOnClickListener {
+            holder.itemView.setOnClickListener {
                 val action = PlacesFragmentDirections.actionPlacesFragmentToRoutesFragment(current.id)
                 it.findNavController().navigate(action)
             }
             //long clicking will open editor of clicked place
-            holder.imageView.setOnLongClickListener {
-                val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(current.id)
+            holder.itemView.setOnLongClickListener {
+                val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(title_edit, current.id)
                 it.findNavController().navigate(action)
                 true
             }

@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.navigationaid.HomeFragment"
-        android:label="fragment_home"
+        android:label="@string/home_fragment_title"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_placesFragment"
@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/placesFragment"
         android:name="com.example.navigationaid.PlacesFragment"
-        android:label="fragment_places"
+        android:label="@string/places_fragment_title"
         tools:layout="@layout/fragment_places">
         <action
             android:id="@+id/action_placesFragment_to_placeEditorFragment"
@@ -32,8 +32,11 @@
     <fragment
         android:id="@+id/placeEditorFragment"
         android:name="com.example.navigationaid.PlaceEditorFragment"
-        android:label="fragment_place_editor"
+        android:label="{title}"
         tools:layout="@layout/fragment_place_editor">
+        <argument
+            android:name="title"
+            app:argType="string" />
         <argument
             android:name="item_id"
             android:defaultValue="-1"
@@ -41,8 +44,8 @@
         <argument
             android:name="selected_geopoint"
             android:defaultValue="@null"
-            app:nullable="true"
-            app:argType="string"/>
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_placeEditorFragment_to_placesFragment"
             app:destination="@id/placesFragment"
@@ -55,17 +58,21 @@
     <fragment
         android:id="@+id/quizContainerFragment"
         android:name="com.example.navigationaid.QuizContainerFragment"
-        android:label="fragment_quiz_container"
+        android:label="@string/quiz_container_fragment_title"
         tools:layout="@layout/fragment_quiz_container" />
     <fragment
         android:id="@+id/routeOverviewFragment"
         android:name="com.example.navigationaid.RouteOverviewFragment"
         android:label="fragment_route_overview"
-        tools:layout="@layout/fragment_route_overview" />
+        tools:layout="@layout/fragment_route_overview">
+        <argument
+            android:name="route_id"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/routesFragment"
         android:name="com.example.navigationaid.RoutesFragment"
-        android:label="fragment_routes"
+        android:label="@string/routes_fragment_title"
         tools:layout="@layout/fragment_routes">
         <argument
             android:name="item_id"
@@ -73,15 +80,23 @@
         <action
             android:id="@+id/action_routesFragment_to_routeOverviewFragment"
             app:destination="@id/routeOverviewFragment" />
+        <action
+            android:id="@+id/action_routesFragment_to_placesFragment"
+            app:destination="@id/placesFragment"
+            app:popUpTo="@id/placesFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.example.navigationaid.MapFragment"
-        android:label="fragment_map"
+        android:label="@string/map_fragment_title"
         tools:layout="@layout/fragment_map">
         <argument
             android:name="item_id"
             app:argType="integer" />
+        <argument
+            android:name="title"
+            app:argType="string" />
         <action
             android:id="@+id/action_mapFragment_to_placeEditorFragment"
             app:destination="@id/placeEditorFragment"

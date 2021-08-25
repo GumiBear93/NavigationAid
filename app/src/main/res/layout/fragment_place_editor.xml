@@ -21,7 +21,7 @@
             app:layout_constraintHeight_max="240dp"
             app:layout_constraintDimensionRatio="H,1:1"
             app:layout_constraintEnd_toStartOf="@id/layout_image_buttons"
-            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
@@ -43,13 +43,15 @@
                 android:id="@+id/button_camera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/open_camera" />
+                android:text="@string/open_camera"
+                app:icon="@drawable/ic_baseline_photo_camera_24"/>
 
             <Button
                 android:id="@+id/button_gallery"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/open_gallery" />
+                android:text="@string/open_gallery"
+                app:icon="@drawable/ic_baseline_photo_24"/>
 
         </LinearLayout>
 
@@ -127,6 +129,19 @@
                 android:text="@string/done" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/button_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_between_elements"
+            android:text="@string/delete_place"
+            android:textColor="@color/red"
+            style="?attr/materialButtonOutlinedStyle"
+            app:icon="@drawable/ic_baseline_delete_24"
+            app:layout_constraintTop_toBottomOf="@id/list_confirmation_buttons"
+            app:layout_constraintStart_toStartOf="@id/list_confirmation_buttons"
+            app:layout_constraintEnd_toEndOf="@id/list_confirmation_buttons"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,7 +5,8 @@
     <string name="my_places">Meine Orte</string>
     <string name="take_quiz">Quiz nehmen</string>
     <string name="hint">Hilfestellung</string>
-    <string name="add_new_place">neuen Ort hinzufügen</string>
+    <string name="add_new_place">Neuen Ort hinzufügen</string>
+    <string name="edit_place">Ort bearbeiten</string>
     <string name="place_name_req">Name des Ortes <font color='#FF0000'>*</font></string>
     <string name="open_camera">Kamera</string>
     <string name="open_gallery">Gallerie</string>
@@ -16,8 +17,18 @@
     <string name="done">Fertig</string>
     <string name="content_desc_place_preview">Vorschau für Ort</string>
     <string name="camera_error">Kamera Fehler</string>
-    <string name="permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
+    <string name="image_permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
     <string name="choose_image">Wähle ein Bild</string>
     <string name="location_disabled">Standort nicht aktiviert</string>
     <string name="content_desc_find_location">Standort finden</string>
+    <string name="navigation_duration">Dauer</string>
+    <string name="difficulty">Schwierigkeit</string>
+    <string name="location_permission_required">Erlaubnis für Standort nötig</string>
+    <string name="duration_minutes">"%s Minuten"</string>
+    <string name="map_fragment_title">Wähle einen Standort</string>
+    <string name="routes_fragment_title">Routen</string>
+    <string name="quiz_container_fragment_title">Quiz</string>
+    <string name="places_fragment_title">Meine Orte</string>
+    <string name="home_fragment_title">NavigationAid</string>
+    <string name="delete_place">Ort löschen</string>
 </resources>
