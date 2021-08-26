@@ -31,4 +31,6 @@
     <string name="places_fragment_title">Meine Orte</string>
     <string name="home_fragment_title">NavigationAid</string>
     <string name="delete_place">Ort löschen</string>
+    <string name="destination">Ziel: %s</string>
+    <string name="route_overview_fragment_title">Routenübersicht</string>
 </resources>

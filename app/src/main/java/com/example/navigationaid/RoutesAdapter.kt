@@ -6,9 +6,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.navigationaid.data.RoadDifficulty
+import com.example.navigationaid.data.RouteItem
 import com.example.navigationaid.databinding.RouteItemViewBinding
-import com.example.navigationaid.routing.RoadDifficulty
-import com.example.navigationaid.routing.RouteItem
 
 class RoutesAdapter(private val durationPlaceholder: String) :
     ListAdapter<RouteItem, RoutesAdapter.RoutesViewHolder>(DiffCallback) {

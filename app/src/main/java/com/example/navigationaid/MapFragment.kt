@@ -166,6 +166,11 @@ class MapFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     companion object {
         const val CANCEL_MAP_NAVIGATION_CODE = -2
         private const val LOG_TAG = "MapFragment"

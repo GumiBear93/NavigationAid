@@ -7,6 +7,17 @@
     android:layout_margin="@dimen/margin"
     tools:context=".PlacesFragment">
 
+    <TextView
+        android:id="@+id/text_view_destination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_between_elements"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:textAppearance="?attr/textAppearanceOverline"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Ziel: Zuhause"/>
+
     <ImageView
         android:id="@+id/image_view_path"
         android:layout_width="32dp"
@@ -16,7 +27,7 @@
         android:src="@drawable/ic_path"
         app:layout_constraintEnd_toStartOf="@id/text_view_duration_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_destination" />
 
     <TextView
         android:id="@+id/text_view_duration_label"
@@ -25,7 +36,7 @@
         app:layout_constraintEnd_toStartOf="@id/text_view_difficulty_label"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/image_view_path"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_destination" />
 
     <TextView
         android:id="@+id/text_view_difficulty_label"
@@ -34,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/text_view_duration_label"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_destination" />
 
     <View
         android:id="@+id/divider"
@@ -59,7 +70,6 @@
         android:id="@+id/image_view_loading"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_between_elements"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         android:src="@drawable/loading_animation"

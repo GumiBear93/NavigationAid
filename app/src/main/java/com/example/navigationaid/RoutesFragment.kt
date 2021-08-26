@@ -101,6 +101,8 @@ class RoutesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        sharedViewModel.clearData()
+
         if (!getLocationPermission()) {
             Toast.makeText(requireContext(), getString(R.string.location_permission_required), Toast.LENGTH_SHORT).show()
             val action = RoutesFragmentDirections.actionRoutesFragmentToPlacesFragment()
@@ -125,7 +127,9 @@ class RoutesFragment : Fragment() {
         }
 
         sharedViewModel.retrievePlaceItem(id).observe(this.viewLifecycleOwner) { selectedDestination ->
+            val destinationName = getString(R.string.destination, selectedDestination.name)
             sharedViewModel.getRoads(userLocation!!, selectedDestination, roadManager)
+            binding.textViewDestination.text = destinationName
         }
 
         sharedViewModel.status.observe(this.viewLifecycleOwner) {
@@ -161,7 +165,6 @@ class RoutesFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        sharedViewModel.clearData()
         _binding = null
     }
 

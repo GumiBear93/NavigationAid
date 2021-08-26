@@ -1,4 +1,4 @@
-package com.example.navigationaid.routing
+package com.example.navigationaid.data
 
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.util.GeoPoint

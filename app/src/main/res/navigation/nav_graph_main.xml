@@ -63,7 +63,7 @@
     <fragment
         android:id="@+id/routeOverviewFragment"
         android:name="com.example.navigationaid.RouteOverviewFragment"
-        android:label="fragment_route_overview"
+        android:label="@string/route_overview_fragment_title"
         tools:layout="@layout/fragment_route_overview">
         <argument
             android:name="route_id"

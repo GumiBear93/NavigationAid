@@ -53,6 +53,11 @@ class PlacesFragment : Fragment() {
         setGridLayout(orientation)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         setGridLayout(newConfig.orientation)
