@@ -4,19 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/margin"
+    android:padding="@dimen/padding"
     tools:context=".PlacesFragment">
 
     <TextView
         android:id="@+id/text_view_destination"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_between_elements"
         android:gravity="center"
-        android:textSize="12sp"
+        android:paddingBottom="@dimen/padding"
         android:textAppearance="?attr/textAppearanceOverline"
+        android:textSize="12sp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Ziel: Zuhause"/>
+        tools:text="Ziel: Zuhause" />
 
     <ImageView
         android:id="@+id/image_view_path"

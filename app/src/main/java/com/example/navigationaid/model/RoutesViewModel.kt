@@ -1,14 +1,18 @@
 package com.example.navigationaid.model
 
+import android.content.Context
 import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.navigationaid.R
 import com.example.navigationaid.data.*
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.util.GeoPoint
+import java.text.SimpleDateFormat
+import java.util.*
 
 enum class RouteApiStatus { LOADING, ERROR, DONE }
 
@@ -16,12 +20,14 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
     private val _allRoutes: MutableLiveData<List<RouteItem>> = MutableLiveData(mutableListOf())
     val allRoutes: LiveData<List<RouteItem>> get() = _allRoutes
     private val _allRoads: MutableLiveData<Array<Road>> = MutableLiveData(arrayOf())
-    private val _status: MutableLiveData<RouteApiStatus> = MutableLiveData(null)
+    private val _status: MutableLiveData<RouteApiStatus> = MutableLiveData(RouteApiStatus.LOADING)
     val status: LiveData<RouteApiStatus> get() = _status
-    private var selectedRoute: RouteItem? = null
-
-    private lateinit var startPoint: GeoPoint
-    private lateinit var endPoint: GeoPoint
+    private var _destination: PlaceItem? = null
+    val destination get() = _destination
+    private var _selectedRoute: RouteItem? = null
+    val selectedRoute: RouteItem? get() = _selectedRoute
+    private var _startPoint: GeoPoint? = null
+    private var _endPoint: GeoPoint? = null
 
 
     // retrieves PlaceItem from the Database
@@ -29,11 +35,12 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
         return itemDao.getPlaceItem(id).asLiveData()
     }
 
-    fun getRoads(startPoint: GeoPoint, destinationItem: PlaceItem, roadManager: RoadManager) {
-        this.startPoint = startPoint
-        this.endPoint = destinationItem.point.toGeoPoint()
-        _status.value = RouteApiStatus.LOADING
-        val waypoints: ArrayList<GeoPoint> = arrayListOf(this.startPoint, this.endPoint)
+    fun getRoads(startPoint: GeoPoint?, destinationItem: PlaceItem, roadManager: RoadManager) {
+        this._startPoint = startPoint
+        this._endPoint = destinationItem.point.toGeoPoint()
+        clearData()
+
+        val waypoints: ArrayList<GeoPoint> = arrayListOf(this._startPoint!!, this._endPoint!!)
 
         (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
         val task = RoadGetter(this)
@@ -54,13 +61,13 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 
     fun calculateRoutes() {
-        if(_allRoads.value != null) {
+        if (_allRoads.value != null) {
             val routePlaceholder: MutableList<RouteItem> = mutableListOf()
             for (road in _allRoads.value!!) {
                 val routeItem = RouteItem(
                     road = road,
-                    startPoint = startPoint,
-                    endPoint = endPoint,
+                    startPoint = _startPoint!!,
+                    endPoint = _endPoint!!,
                     duration = road.mDuration,
                     roadDifficulty = RoadDifficulty.DIFFICULTY_5
                 )
@@ -73,11 +80,63 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
     fun clearData() {
         _allRoads.value = arrayOf()
         _allRoutes.value = mutableListOf()
-        _status.value = null
+        _status.value = RouteApiStatus.LOADING
     }
 
     fun setSelectRoad(route: RouteItem) {
-        selectedRoute = route
+        _selectedRoute = route
+    }
+
+    fun setDestination(placeItem: PlaceItem) {
+        _destination = placeItem
+    }
+
+    fun getFormattedEta(timeMinutes: Int): String {
+        val formatter = SimpleDateFormat("H:m", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, timeMinutes)
+        return formatter.format(calendar.time)
+    }
+
+    fun getDifficultyImageResourceId(difficulty: RoadDifficulty): Int {
+        return when (difficulty) {
+            RoadDifficulty.DIFFICULTY_1 -> R.drawable.ic_difficulty_1
+            RoadDifficulty.DIFFICULTY_2 -> R.drawable.ic_difficulty_2
+            RoadDifficulty.DIFFICULTY_3 -> R.drawable.ic_difficulty_3
+            RoadDifficulty.DIFFICULTY_4 -> R.drawable.ic_difficulty_4
+            else -> R.drawable.ic_difficulty_5
+        }
+    }
+
+    fun getDifficultyImageDescription(difficulty: RoadDifficulty, context: Context): String {
+        val difficultyDescriptions = arrayOf(
+            context.resources.getString(R.string.description_difficulty_1),
+            context.resources.getString(R.string.description_difficulty_2),
+            context.resources.getString(R.string.description_difficulty_3),
+            context.resources.getString(R.string.description_difficulty_4),
+            context.resources.getString(R.string.description_difficulty_5)
+        )
+        return when (difficulty) {
+            RoadDifficulty.DIFFICULTY_1 -> difficultyDescriptions[0]
+            RoadDifficulty.DIFFICULTY_2 -> difficultyDescriptions[1]
+            RoadDifficulty.DIFFICULTY_3 -> difficultyDescriptions[2]
+            RoadDifficulty.DIFFICULTY_4 -> difficultyDescriptions[3]
+            else -> difficultyDescriptions[4]
+        }
+    }
+
+    fun getFormattedDuration(duration: Double, context: Context): String {
+        val minutes = (duration / 60.0).toInt()
+        return context.resources.getString(R.string.duration_minutes, minutes.toString())
+    }
+
+    fun getFormattedDestinationName(context: Context): String {
+        val name = destination?.name
+        return if(name != null) {
+            context.resources.getString(R.string.destination, name)
+        } else {
+            ""
+        }
     }
 }
 

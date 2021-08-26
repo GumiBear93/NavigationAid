@@ -1,14 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="vertical"
     tools:context=".RouteOverviewFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/text_view_destination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/padding"
+            android:textAppearance="?attr/textAppearanceOverline"
+            android:textSize="12sp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Ziel: Zuhause" />
+
+        <LinearLayout
+            android:id="@+id/layout_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_between_elements"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/text_view_destination">
+
+            <TextView
+                style="@style/RouteOverviewText"
+                android:text="@string/navigation_duration" />
+
+            <TextView
+                android:id="@+id/text_view_duration"
+                style="@style/RouteOverviewText"
+                tools:text="20 Minuten" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider1"
+            style="@style/Divider"
+            android:layout_margin="@dimen/margin_between_elements"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_duration" />
+
+        <LinearLayout
+            android:id="@+id/layout_eta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_between_elements"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/divider1">
+
+            <TextView
+                style="@style/RouteOverviewText"
+                android:text="@string/estimated_time_of_arrival" />
+
+            <TextView
+                android:id="@+id/text_view_eta"
+                style="@style/RouteOverviewText"
+                tools:text="17:00 Uhr" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider2"
+            style="@style/Divider"
+            android:layout_margin="@dimen/margin_between_elements"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_eta" />
+
+        <LinearLayout
+            android:id="@+id/layout_difficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_between_elements"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/divider2">
+
+            <TextView
+                style="@style/RouteOverviewText"
+                android:text="@string/difficulty" />
+
+            <ImageView
+                android:id="@+id/image_view_difficulty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                tools:src="@drawable/ic_difficulty_5"
+                tools:ignore="ContentDescription"/>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider3"
+            style="@style/Divider"
+            android:layout_margin="@dimen/margin_between_elements"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_difficulty" />
+
+        <Button
+            android:id="@+id/button_open_map"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:layout_marginBottom="@dimen/margin_between_elements"
+            android:text="@string/view_on_map"
+            app:icon="@drawable/ic_baseline_map_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider3" />
+
+        <Button
+
+            android:id="@+id/button_start_navigation"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_between_elements"
+            android:text="@string/start_navigation"
+            app:icon="@drawable/ic_baseline_directions_walk_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button_open_map" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

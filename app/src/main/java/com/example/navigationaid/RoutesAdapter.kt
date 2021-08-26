@@ -1,16 +1,20 @@
 package com.example.navigationaid
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.navigationaid.data.RoadDifficulty
 import com.example.navigationaid.data.RouteItem
 import com.example.navigationaid.databinding.RouteItemViewBinding
+import com.example.navigationaid.model.RoutesViewModel
 
-class RoutesAdapter(private val durationPlaceholder: String) :
+class RoutesAdapter(
+    private val context: Context,
+    private val sharedViewModel: RoutesViewModel
+) :
     ListAdapter<RouteItem, RoutesAdapter.RoutesViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoutesViewHolder {
@@ -20,7 +24,8 @@ class RoutesAdapter(private val durationPlaceholder: String) :
                     parent.context
                 )
             ),
-            durationPlaceholder
+            context,
+            sharedViewModel
         )
     }
 
@@ -36,22 +41,21 @@ class RoutesAdapter(private val durationPlaceholder: String) :
 
     class RoutesViewHolder(
         private var binding: RouteItemViewBinding,
-        private var durationPlaceholder: String
+        private val context: Context,
+        private val sharedViewModel: RoutesViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(routeItem: RouteItem) {
-            val imageResource = when (routeItem.roadDifficulty) {
-                RoadDifficulty.DIFFICULTY_1 -> R.drawable.ic_difficulty_1
-                RoadDifficulty.DIFFICULTY_2 -> R.drawable.ic_difficulty_2
-                RoadDifficulty.DIFFICULTY_3 -> R.drawable.ic_difficulty_3
-                RoadDifficulty.DIFFICULTY_4 -> R.drawable.ic_difficulty_4
-                else -> R.drawable.ic_difficulty_5
-            }
+            val imageResource =
+                sharedViewModel.getDifficultyImageResourceId(routeItem.roadDifficulty)
+            val duration = sharedViewModel.getFormattedDuration(routeItem.duration, context)
+            val imageDescription =
+                sharedViewModel.getDifficultyImageDescription(routeItem.roadDifficulty, context)
 
             binding.apply {
                 textViewItemNumber.text = (adapterPosition + 1).toString()
-                textViewDuration.text =
-                    String.format(durationPlaceholder, (routeItem.duration / 60.0).toInt())
+                textViewDuration.text = duration
                 imageViewDifficulty.setImageResource(imageResource)
+                imageViewDifficulty.contentDescription = imageDescription
             }
 
         }

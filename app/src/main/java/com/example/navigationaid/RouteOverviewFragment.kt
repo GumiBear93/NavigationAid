@@ -5,27 +5,41 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
+import com.example.navigationaid.databinding.FragmentRouteOverviewBinding
+import com.example.navigationaid.model.RoutesViewModel
+import com.example.navigationaid.model.RoutesViewModelFactory
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [RouteOverviewFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RouteOverviewFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentRouteOverviewBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private val navigationArgs: RouteOverviewFragmentArgs by navArgs()
+
+    private val sharedViewModel: RoutesViewModel by activityViewModels {
+        RoutesViewModelFactory(
+            (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private fun bind() {
+        val route = sharedViewModel.selectedRoute!!
+        val duration = ((route.duration)/60).toInt()
+
+        val destinationText = sharedViewModel.getFormattedDestinationName(requireContext())
+        val durationText = sharedViewModel.getFormattedDuration(route.duration, requireContext())
+        val eta = sharedViewModel.getFormattedEta(duration)
+        val difficultyImageResourceId = sharedViewModel.getDifficultyImageResourceId(route.roadDifficulty)
+        val difficultyDescription = sharedViewModel.getDifficultyImageDescription(route.roadDifficulty, requireContext())
+
+        binding.apply {
+            textViewDestination.text = destinationText
+            textViewDuration.text = durationText
+            textViewEta.text = eta
+            imageViewDifficulty.setImageResource(difficultyImageResourceId)
+            imageViewDifficulty.contentDescription = difficultyDescription
         }
     }
 
@@ -33,27 +47,17 @@ class RouteOverviewFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_route_overview, container, false)
+        _binding = FragmentRouteOverviewBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RouteOverviewFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RouteOverviewFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val routeId = navigationArgs.routeId
+        val routeItem = sharedViewModel.allRoutes.value!![routeId]
+        sharedViewModel.setSelectRoad(routeItem)
+
+        bind()
     }
 }

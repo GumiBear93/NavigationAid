@@ -119,16 +119,17 @@ class RoutesFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        val durationPlaceholder = getString(R.string.duration_minutes)
-        val adapter = RoutesAdapter(durationPlaceholder)
-        binding.recyclerView.apply {
-            this.adapter = adapter
-            this.layoutManager = LinearLayoutManager(requireContext())
+        val adapter = RoutesAdapter(requireContext(), sharedViewModel)
+        binding.apply {
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
         }
 
         sharedViewModel.retrievePlaceItem(id).observe(this.viewLifecycleOwner) { selectedDestination ->
-            val destinationName = getString(R.string.destination, selectedDestination.name)
-            sharedViewModel.getRoads(userLocation!!, selectedDestination, roadManager)
+            sharedViewModel.setDestination(selectedDestination)
+            sharedViewModel.getRoads(userLocation, selectedDestination, roadManager)
+
+            val destinationName = sharedViewModel.getFormattedDestinationName(requireContext())
             binding.textViewDestination.text = destinationName
         }
 
