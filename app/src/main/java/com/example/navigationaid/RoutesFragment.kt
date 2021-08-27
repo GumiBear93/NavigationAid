@@ -35,6 +35,7 @@ class RoutesFragment : Fragment() {
 
     private val sharedViewModel: RoutesViewModel by activityViewModels {
         RoutesViewModelFactory(
+            activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
@@ -129,7 +130,7 @@ class RoutesFragment : Fragment() {
             sharedViewModel.setDestination(selectedDestination)
             sharedViewModel.getRoads(userLocation, selectedDestination, roadManager)
 
-            val destinationName = sharedViewModel.getFormattedDestinationName(requireContext())
+            val destinationName = sharedViewModel.getFormattedDestinationName()
             binding.textViewDestination.text = destinationName
         }
 

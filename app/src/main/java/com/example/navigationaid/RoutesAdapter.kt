@@ -47,9 +47,9 @@ class RoutesAdapter(
         fun bind(routeItem: RouteItem) {
             val imageResource =
                 sharedViewModel.getDifficultyImageResourceId(routeItem.roadDifficulty)
-            val duration = sharedViewModel.getFormattedDuration(routeItem.duration, context)
+            val duration = sharedViewModel.getFormattedDuration(routeItem.duration)
             val imageDescription =
-                sharedViewModel.getDifficultyImageDescription(routeItem.roadDifficulty, context)
+                sharedViewModel.getDifficultyImageDescription(routeItem.roadDifficulty)
 
             binding.apply {
                 textViewItemNumber.text = (adapterPosition + 1).toString()

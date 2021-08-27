@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentRouteOverviewBinding
 import com.example.navigationaid.model.RoutesViewModel
@@ -20,19 +21,19 @@ class RouteOverviewFragment : Fragment() {
 
     private val sharedViewModel: RoutesViewModel by activityViewModels {
         RoutesViewModelFactory(
+            activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 
     private fun bindInfo() {
         val route = sharedViewModel.selectedRoute!!
-        val duration = ((route.duration)/60).toInt()
 
-        val destinationText = sharedViewModel.getFormattedDestinationName(requireContext())
-        val durationText = sharedViewModel.getFormattedDuration(route.duration, requireContext())
-        val eta = sharedViewModel.getFormattedEta(duration)
+        val destinationText = sharedViewModel.getFormattedDestinationName()
+        val durationText = sharedViewModel.getFormattedDuration(route.duration)
+        val eta = sharedViewModel.getFormattedEta(route.duration)
         val difficultyImageResourceId = sharedViewModel.getDifficultyImageResourceId(route.roadDifficulty)
-        val difficultyDescription = sharedViewModel.getDifficultyImageDescription(route.roadDifficulty, requireContext())
+        val difficultyDescription = sharedViewModel.getDifficultyImageDescription(route.roadDifficulty)
 
         binding.apply {
             textViewDestination.text = destinationText
@@ -59,5 +60,12 @@ class RouteOverviewFragment : Fragment() {
         sharedViewModel.setSelectRoad(routeItem)
 
         bindInfo()
+
+        binding.apply {
+            buttonOpenMap.setOnClickListener {
+                val action = RouteOverviewFragmentDirections.actionRouteOverviewFragmentToRouteViewerFragment()
+                findNavController().navigate(action)
+            }
+        }
     }
 }

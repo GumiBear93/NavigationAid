@@ -47,6 +47,8 @@ class PlacesFragment : Fragment() {
             placeItems.let {
                 adapter.submitList(it)
             }
+
+            (binding.recyclerView.layoutManager as GridLayoutManager).scrollToPosition(0)
         }
 
         val orientation = this.resources.configuration.orientation

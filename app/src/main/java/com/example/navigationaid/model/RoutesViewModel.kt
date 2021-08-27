@@ -1,6 +1,6 @@
 package com.example.navigationaid.model
 
-import android.content.Context
+import android.app.Application
 import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.*
@@ -16,7 +16,7 @@ import java.util.*
 
 enum class RouteApiStatus { LOADING, ERROR, DONE }
 
-class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
+class RoutesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
     private val _allRoutes: MutableLiveData<List<RouteItem>> = MutableLiveData(mutableListOf())
     val allRoutes: LiveData<List<RouteItem>> get() = _allRoutes
     private val _allRoads: MutableLiveData<Array<Road>> = MutableLiveData(arrayOf())
@@ -28,7 +28,6 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
     val selectedRoute: RouteItem? get() = _selectedRoute
     private var _startPoint: GeoPoint? = null
     private var _endPoint: GeoPoint? = null
-
 
     // retrieves PlaceItem from the Database
     fun retrievePlaceItem(id: Int): LiveData<PlaceItem> {
@@ -91,13 +90,6 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
         _destination = placeItem
     }
 
-    fun getFormattedEta(timeMinutes: Int): String {
-        val formatter = SimpleDateFormat("H:m", Locale.getDefault())
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.MINUTE, timeMinutes)
-        return formatter.format(calendar.time)
-    }
-
     fun getDifficultyImageResourceId(difficulty: RoadDifficulty): Int {
         return when (difficulty) {
             RoadDifficulty.DIFFICULTY_1 -> R.drawable.ic_difficulty_1
@@ -108,7 +100,9 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
         }
     }
 
-    fun getDifficultyImageDescription(difficulty: RoadDifficulty, context: Context): String {
+    fun getDifficultyImageDescription(difficulty: RoadDifficulty): String {
+        val context = getApplication<Application>().applicationContext
+
         val difficultyDescriptions = arrayOf(
             context.resources.getString(R.string.description_difficulty_1),
             context.resources.getString(R.string.description_difficulty_2),
@@ -125,13 +119,25 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
         }
     }
 
-    fun getFormattedDuration(duration: Double, context: Context): String {
+    fun getFormattedDuration(duration: Double): String {
+        val context = getApplication<Application>().applicationContext
+
         val minutes = (duration / 60.0).toInt()
         return context.resources.getString(R.string.duration_minutes, minutes.toString())
     }
 
-    fun getFormattedDestinationName(context: Context): String {
-        val name = destination?.name
+    fun getFormattedEta(duration: Double): String {
+        val timeMinutes = (duration / 60).toInt()
+        val formatter = SimpleDateFormat("H:m", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, timeMinutes)
+        return formatter.format(calendar.time)
+    }
+
+    fun getFormattedDestinationName(): String {
+        val context = getApplication<Application>().applicationContext
+
+        val name = _destination?.name
         return if(name != null) {
             context.resources.getString(R.string.destination, name)
         } else {
@@ -140,12 +146,12 @@ class RoutesViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 }
 
-class RoutesViewModelFactory(private val itemDao: ItemDao) :
+class RoutesViewModelFactory(private val application: Application, private val itemDao: ItemDao) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RoutesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return RoutesViewModel(itemDao) as T
+            return RoutesViewModel(application, itemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
