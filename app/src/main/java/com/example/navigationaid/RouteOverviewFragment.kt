@@ -24,7 +24,7 @@ class RouteOverviewFragment : Fragment() {
         )
     }
 
-    private fun bind() {
+    private fun bindInfo() {
         val route = sharedViewModel.selectedRoute!!
         val duration = ((route.duration)/60).toInt()
 
@@ -58,6 +58,6 @@ class RouteOverviewFragment : Fragment() {
         val routeItem = sharedViewModel.allRoutes.value!![routeId]
         sharedViewModel.setSelectRoad(routeItem)
 
-        bind()
+        bindInfo()
     }
 }

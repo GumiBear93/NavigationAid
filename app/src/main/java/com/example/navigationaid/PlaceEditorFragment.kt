@@ -226,7 +226,7 @@ class PlaceEditorFragment : Fragment() {
             // user just entered PlaceEditor or comes back from Map without saving location
             if (placePointString == null) {
                 // user entered PlaceEditor from Places List
-                if (id != MapFragment.CANCEL_MAP_NAVIGATION_CODE) {
+                if (id != LocationPickerFragment.CANCEL_MAP_NAVIGATION_CODE) {
                     sharedViewModel.resetUserInput()
                 }
             }
@@ -249,7 +249,7 @@ class PlaceEditorFragment : Fragment() {
                 storeTextInput()
                 val title = navigationArgs.title
                 val action =
-                    PlaceEditorFragmentDirections.actionPlaceEditorFragmentToMapFragment(id, title)
+                    PlaceEditorFragmentDirections.actionPlaceEditorFragmentToLocationPickerFragment(id, title)
                 findNavController().navigate(action)
             }
             buttonCancel.setOnClickListener {

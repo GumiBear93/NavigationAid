@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.navigationaid.databinding.FragmentMapBinding
+import com.example.navigationaid.databinding.FragmentLocationPickerBinding
 import com.example.navigationaid.model.PlacesViewModel
 import com.example.navigationaid.model.PlacesViewModelFactory
 import org.osmdroid.api.IMapController
@@ -25,11 +25,11 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
-class MapFragment : Fragment() {
-    private var _binding: FragmentMapBinding? = null
+class LocationPickerFragment : Fragment() {
+    private var _binding: FragmentLocationPickerBinding? = null
     private val binding get() = _binding!!
 
-    private val navigationArgs: MapFragmentArgs by navArgs()
+    private val navigationArgs: LocationPickerFragmentArgs by navArgs()
 
     private val sharedViewModel: PlacesViewModel by activityViewModels {
         PlacesViewModelFactory(
@@ -102,7 +102,7 @@ class MapFragment : Fragment() {
         val id = navigationArgs.itemId
         val title = navigationArgs.title
         val finalLocation = GeoPoint(map.mapCenter).toString()
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, finalLocation)
+        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, finalLocation)
         findNavController().navigate(action)
     }
 
@@ -120,7 +120,7 @@ class MapFragment : Fragment() {
         } else {
             null
         }
-        val action = MapFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, location)
+        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, location)
         findNavController().navigate(action)
     }
 
@@ -128,7 +128,7 @@ class MapFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentMapBinding.inflate(inflater, container, false)
+        _binding = FragmentLocationPickerBinding.inflate(inflater, container, false)
         return binding.root
     }
 
