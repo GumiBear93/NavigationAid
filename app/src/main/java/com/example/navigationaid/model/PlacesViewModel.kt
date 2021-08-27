@@ -1,6 +1,7 @@
 package com.example.navigationaid.model
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
@@ -14,7 +15,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
+class PlacesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
 
     val allPlaceItems: LiveData<List<PlaceItem>> = itemDao.getPlaceItems().asLiveData()
 
@@ -52,12 +53,11 @@ class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
 
     // swaps preview images, create new and updated placeItem, call function to update in Database
     fun updatePlaceItem(
-        context: Context,
         oldPlaceItem: PlaceItem,
         placeItemName: String
     ) {
-        deleteImage(context, oldPlaceItem.imageName)
-        saveImage(context)
+        deleteImage(oldPlaceItem.imageName)
+        saveImage()
         val updatedPlaceItem = getUpdatedPlaceItemEntry(
             oldPlaceItem.id,
             placeItemName,
@@ -98,12 +98,19 @@ class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
     // only call if isEntryValid has returned true!
     // calls saveImage, if successful (_placeImageName has been set) call getNewPlaceItemEntry
     // saves the created PlaceItem in the database with insertPlaceItem
-    fun addNewPlaceItem(context: Context, placeItemName: String) {
-        saveImage(context)
+    fun addNewPlaceItem(placeItemName: String) {
+        saveImage()
         if (_placeImageName != null) {
             val newPlaceItem =
                 getNewPlaceItemEntry(placeItemName, _placePoint.value!!, _placeImageName!!)
             insertPlaceItem(newPlaceItem)
+        }
+    }
+
+    fun deletePlaceItem(placeItem: PlaceItem) {
+        deleteImage(placeItem.imageName)
+        viewModelScope.launch {
+            itemDao.delete(placeItem)
         }
     }
 
@@ -141,7 +148,8 @@ class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
 
     // attempts to save image to private app location
     @SuppressLint("SimpleDateFormat")
-    private fun saveImage(context: Context) {
+    private fun saveImage() {
+        val context = getApplication<Application>().applicationContext
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
         val fileName = "JPEG_${timeStamp}"
         try {
@@ -155,7 +163,9 @@ class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 
     // attempts to delete old image to make room for updated image
-    private fun deleteImage(context: Context, fileName: String) {
+    private fun deleteImage(fileName: String) {
+        val context = getApplication<Application>().applicationContext
+
         val file = File(context.filesDir, fileName)
         if (file.exists()) {
             file.delete()
@@ -167,12 +177,12 @@ class PlacesViewModel(private val itemDao: ItemDao) : ViewModel() {
     }
 }
 
-class PlacesViewModelFactory(private val itemDao: ItemDao) :
+class PlacesViewModelFactory(val application: Application, private val itemDao: ItemDao) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PlacesViewModel(itemDao) as T
+            return PlacesViewModel(application, itemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

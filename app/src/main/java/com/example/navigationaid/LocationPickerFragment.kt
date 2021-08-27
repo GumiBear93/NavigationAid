@@ -33,6 +33,7 @@ class LocationPickerFragment : Fragment() {
 
     private val sharedViewModel: PlacesViewModel by activityViewModels {
         PlacesViewModelFactory(
+            activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
@@ -127,7 +128,7 @@ class LocationPickerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLocationPickerBinding.inflate(inflater, container, false)
         return binding.root
     }

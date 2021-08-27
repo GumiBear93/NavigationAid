@@ -109,6 +109,6 @@
     <fragment
         android:id="@+id/routeViewerFragment"
         android:name="com.example.navigationaid.RouteViewerFragment"
-        android:label="fragment_route_viewer"
+        android:label="@string/route_viewer_fragment_title"
         tools:layout="@layout/fragment_route_viewer" />
 </navigation>

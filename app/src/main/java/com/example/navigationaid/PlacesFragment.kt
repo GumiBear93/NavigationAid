@@ -18,6 +18,7 @@ class PlacesFragment : Fragment() {
 
     private val sharedViewModel: PlacesViewModel by activityViewModels {
         PlacesViewModelFactory(
+            activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
@@ -33,7 +34,7 @@ class PlacesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPlacesBinding.inflate(inflater, container, false)
         return binding.root
     }
