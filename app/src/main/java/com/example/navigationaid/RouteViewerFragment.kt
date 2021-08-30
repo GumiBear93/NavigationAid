@@ -40,7 +40,7 @@ class RouteViewerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentRouteViewerBinding.inflate(inflater, container, false)
         return binding.root
     }
