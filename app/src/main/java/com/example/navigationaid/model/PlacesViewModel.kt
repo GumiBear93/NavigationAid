@@ -1,6 +1,5 @@
 package com.example.navigationaid.model
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
@@ -147,10 +146,9 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     }
 
     // attempts to save image to private app location
-    @SuppressLint("SimpleDateFormat")
     private fun saveImage() {
         val context = getApplication<Application>().applicationContext
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "JPEG_${timeStamp}"
         try {
             val fos: FileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)

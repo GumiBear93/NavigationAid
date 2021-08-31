@@ -44,4 +44,6 @@
     <string name="back_to_route_overview">zurück zur Übersicht</string>
     <string name="reset_map_view">Ansicht zurück setzen</string>
     <string name="route_viewer_fragment_title">Routen-Ansicht</string>
+    <string name="share_map">Karte Teilen</string>
+    <string name="storage_permission_required">Speicherfreigabe notwendig</string>
 </resources>

@@ -128,7 +128,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
 
     fun getFormattedEta(duration: Double): String {
         val timeMinutes = (duration / 60).toInt()
-        val formatter = SimpleDateFormat("H:m", Locale.getDefault())
+        val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.MINUTE, timeMinutes)
         return formatter.format(calendar.time)
