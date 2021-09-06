@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_switch_layout"
+    <item android:id="@+id/help_menu"
         android:title="@string/hint"
         android:icon="@drawable/ic_baseline_help_24"
         app:showAsAction="always" />

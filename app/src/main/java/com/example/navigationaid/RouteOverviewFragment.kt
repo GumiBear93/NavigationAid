@@ -2,6 +2,7 @@ package com.example.navigationaid
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -67,5 +68,24 @@ class RouteOverviewFragment : Fragment() {
                 findNavController().navigate(action)
             }
         }
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.help_menu) {
+            sharedViewModel.showHelpDialog(
+                requireActivity(),
+                getString(R.string.help_route_overview)
+            )
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }

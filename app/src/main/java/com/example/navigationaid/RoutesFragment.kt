@@ -8,6 +8,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -163,11 +164,22 @@ class RoutesFragment : Fragment() {
                 }
             }
         }
+
+        setHasOptionsMenu(true)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.help_menu) {
+            sharedViewModel.showHelpDialog(requireActivity(), getString(R.string.help_routes))
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

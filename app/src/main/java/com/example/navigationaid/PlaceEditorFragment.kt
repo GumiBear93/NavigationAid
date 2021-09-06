@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,11 +34,19 @@ class PlaceEditorFragment : Fragment() {
     private lateinit var placeItem: PlaceItem
     private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
 
+    private val sharedViewModel: PlacesViewModel by activityViewModels {
+        PlacesViewModelFactory(
+            activity?.application as NavigationAidApplication,
+            (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
     private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         if (bitmap != null) {
             sharedViewModel.setPlaceImage(bitmap)
         }
     }
+
     private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             val bitmap = if (Build.VERSION.SDK_INT < 28) {
@@ -48,14 +57,6 @@ class PlaceEditorFragment : Fragment() {
             }
             sharedViewModel.setPlaceImage(bitmap)
         }
-    }
-
-
-    private val sharedViewModel: PlacesViewModel by activityViewModels {
-        PlacesViewModelFactory(
-            activity?.application as NavigationAidApplication,
-            (activity?.application as NavigationAidApplication).database.itemDao()
-        )
     }
 
     // call ViewModel function to validate user input
@@ -168,8 +169,8 @@ class PlaceEditorFragment : Fragment() {
     }
 
     private fun showConfirmationDialog() {
-        MaterialAlertDialogBuilder(requireContext()).setTitle("Achtung")
-            .setMessage("Löschen eines Ortes kann nicht rückgängig gemacht werden. Bist du sicher?")
+        MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.delete_confirmation_title))
+            .setMessage(getString(R.string.delete_confirmation_message))
             .setCancelable(true)
             .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .setPositiveButton(getString(R.string.delete_place)) { _, _ ->
@@ -287,6 +288,8 @@ class PlaceEditorFragment : Fragment() {
                 cancelUserInput()
             }
         }
+
+        setHasOptionsMenu(true)
     }
 
     // repopulate text input if returning from camera, gallery or map
@@ -300,6 +303,15 @@ class PlaceEditorFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.help_menu) {
+            sharedViewModel.showHelpDialog(requireActivity(), getString(R.string.help_place_editor))
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     // store codes for camera/ gallery intents in companion object

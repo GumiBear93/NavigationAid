@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -170,6 +171,8 @@ class RouteViewerFragment : Fragment() {
         }
 
         setUpMap(road)
+
+        setHasOptionsMenu(true)
     }
 
     // re-fit the map after device rotation or app-scale change
@@ -179,6 +182,20 @@ class RouteViewerFragment : Fragment() {
         lifecycleScope.launch {
             waitForRouteZoom()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.help_menu) {
+            sharedViewModel.showHelpDialog(requireActivity(), getString(R.string.help_route_viewer))
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

@@ -1,12 +1,15 @@
 package com.example.navigationaid.model
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.navigationaid.R
 import com.example.navigationaid.data.ItemDao
 import com.example.navigationaid.data.PlaceItem
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.io.File
@@ -28,6 +31,16 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     val placeImage: LiveData<Bitmap?> get() = _placeImage
 
     private var _placeImageName: String? = null
+
+    // show MaterialAlertDialog with Help message
+    fun showHelpDialog(activity: Activity, message: String) {
+        MaterialAlertDialogBuilder(activity)
+            .setTitle("Hilfe:")
+            .setIcon(R.drawable.ic_baseline_help_24)
+            .setMessage(message)
+            .setPositiveButton("Okay") { _, _ -> }
+            .show()
+    }
 
     // inserts PlaceItem in the Database
     private fun insertPlaceItem(placeItem: PlaceItem) {

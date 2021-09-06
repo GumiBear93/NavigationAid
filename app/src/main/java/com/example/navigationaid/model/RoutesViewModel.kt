@@ -1,11 +1,13 @@
 package com.example.navigationaid.model
 
+import android.app.Activity
 import android.app.Application
 import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.navigationaid.R
 import com.example.navigationaid.data.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
@@ -28,6 +30,16 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
     val selectedRoute: RouteItem? get() = _selectedRoute
     private var _startPoint: GeoPoint? = null
     private var _endPoint: GeoPoint? = null
+
+    // show MaterialAlertDialog with Help message
+    fun showHelpDialog(activity: Activity, message: String) {
+        MaterialAlertDialogBuilder(activity)
+            .setTitle("Hilfe:")
+            .setIcon(R.drawable.ic_baseline_help_24)
+            .setMessage(message)
+            .setPositiveButton("Okay") { _, _ -> }
+            .show()
+    }
 
     // retrieves PlaceItem from the Database
     fun retrievePlaceItem(id: Int): LiveData<PlaceItem> {
