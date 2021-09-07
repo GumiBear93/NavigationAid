@@ -28,9 +28,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin"
                 android:contentDescription="@string/content_desc_find_location"
-                android:src="@drawable/ic_baseline_my_location_24"
                 app:layout_constraintBottom_toBottomOf="@id/map"
-                app:layout_constraintEnd_toEndOf="@id/map" />
+                app:layout_constraintEnd_toEndOf="@id/map"
+                tools:src="@drawable/ic_baseline_my_location_24"/>
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline"

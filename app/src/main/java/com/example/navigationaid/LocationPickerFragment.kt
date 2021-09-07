@@ -19,8 +19,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentLocationPickerBinding
+import com.example.navigationaid.model.LocationFetchStatus
 import com.example.navigationaid.model.PlacesViewModel
 import com.example.navigationaid.model.PlacesViewModelFactory
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationTokenSource
 import org.osmdroid.api.IMapController
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -41,7 +45,7 @@ class LocationPickerFragment : Fragment() {
 
     private lateinit var map: MapView
     private lateinit var mapController: IMapController
-    private lateinit var locationManager: LocationManager
+    private lateinit var cancelTokenSrc: CancellationTokenSource
 
     // ask user for location permission
     private fun getLocationPermission(): Boolean {
@@ -73,27 +77,46 @@ class LocationPickerFragment : Fragment() {
     // prepare location provider, test for permission in getLocationPermission
     // try to fetch location and pan map-center to chosen point
     @SuppressLint("MissingPermission")
-    private fun setLocationAsUserLocation() {
-        var location: Location? = null
+    private fun getPlayServiceLocation() {
+        val locationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        var location: Location?
         val gpsEnabled: Boolean = try {
             locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                     || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         } catch (e: Exception) {
-            Log.d(LOG_TAG, "setLocationAsUserLocation: $e")
+            Log.d(LOG_TAG, "getPlayServiceLocation: $e")
             false
         }
         if (gpsEnabled && getLocationPermission()) {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-        }
-        if (location != null) {
-            mapController.animateTo(GeoPoint(location))
-            mapController.setZoom(DETAIL_ZOOM)
+            sharedViewModel.setStatusFetching(true)
+            val cancelToken = cancelTokenSrc.token
+            fusedLocationClient.getCurrentLocation(
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                cancelToken
+            )
+                .addOnSuccessListener { freshLocation: Location? ->
+                    location = freshLocation
+                    sharedViewModel.setStatusFetching(false)
+                    if (location != null) {
+                        mapController.animateTo(GeoPoint(location))
+                        mapController.setZoom(DETAIL_ZOOM)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.location_unavailable),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                .addOnCanceledListener {
+                    sharedViewModel.setStatusFetching(false)
+                }
         } else {
             Toast.makeText(
                 requireContext(),
-                getString(R.string.location_disabled),
+                getString(R.string.location_unavailable),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -104,7 +127,11 @@ class LocationPickerFragment : Fragment() {
         val id = navigationArgs.itemId
         val title = navigationArgs.title
         val finalLocation = GeoPoint(map.mapCenter).toString()
-        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, finalLocation)
+        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(
+            title,
+            id,
+            finalLocation
+        )
         findNavController().navigate(action)
     }
 
@@ -122,7 +149,11 @@ class LocationPickerFragment : Fragment() {
         } else {
             null
         }
-        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(title, id, location)
+        val action = LocationPickerFragmentDirections.actionMapFragmentToPlaceEditorFragment(
+            title,
+            id,
+            location
+        )
         findNavController().navigate(action)
     }
 
@@ -144,6 +175,8 @@ class LocationPickerFragment : Fragment() {
 
         mapController = map.controller
 
+        cancelTokenSrc = CancellationTokenSource()
+
         if (sharedViewModel.placePoint.value == null) {
             mapController.setCenter(GeoPoint(MAP_DEFAULT_LATITUDE, MAP_DEFAULT_LONGITUDE))
             mapController.setZoom(OVERVIEW_ZOOM)
@@ -152,12 +185,26 @@ class LocationPickerFragment : Fragment() {
             mapController.setZoom(DETAIL_ZOOM)
         }
 
-        locationManager =
-            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        sharedViewModel.locationStatus.observe(this.viewLifecycleOwner) { state ->
+            if (state == LocationFetchStatus.WAITING) {
+                binding.fabMyLocation.setImageResource(R.drawable.ic_baseline_my_location_24)
+            } else {
+                binding.fabMyLocation.setImageResource(R.drawable.ic_baseline_watch_later_24)
+            }
+        }
 
         binding.apply {
             fabMyLocation.setOnClickListener {
-                setLocationAsUserLocation()
+                //setLocationAsUserLocation()
+                when (sharedViewModel.locationStatus.value) {
+                    LocationFetchStatus.WAITING -> {
+                        getPlayServiceLocation()
+                    }
+                    else -> {
+                        cancelTokenSrc.cancel()
+                        cancelTokenSrc = CancellationTokenSource()
+                    }
+                }
             }
             buttonConfirm.setOnClickListener {
                 confirmLocation()
@@ -172,6 +219,7 @@ class LocationPickerFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cancelTokenSrc.cancel()
         _binding = null
     }
 

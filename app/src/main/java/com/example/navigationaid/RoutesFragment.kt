@@ -23,6 +23,9 @@ import com.example.navigationaid.databinding.FragmentRoutesBinding
 import com.example.navigationaid.model.RouteApiStatus
 import com.example.navigationaid.model.RoutesViewModel
 import com.example.navigationaid.model.RoutesViewModelFactory
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationTokenSource
 import okhttp3.internal.userAgent
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -33,6 +36,8 @@ class RoutesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val navigationArgs: RoutesFragmentArgs by navArgs()
+
+    private lateinit var cancelTokenSrc: CancellationTokenSource
 
     private val sharedViewModel: RoutesViewModel by activityViewModels {
         RoutesViewModelFactory(
@@ -71,25 +76,33 @@ class RoutesFragment : Fragment() {
     // prepare location provider
     // try to fetch location
     @SuppressLint("MissingPermission")
-    private fun getUserLocation(): GeoPoint? {
+    private fun getPlayServiceLocation() {
         val locationManager =
             requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        var location: Location? = null
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         val gpsEnabled: Boolean = try {
             locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                     || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
         } catch (e: Exception) {
-            Log.d(LOG_TAG, "setLocationAsUserLocation: $e")
+            Log.d(LOG_TAG, "getPlayServiceLocation: $e")
             false
         }
         if (gpsEnabled && getLocationPermission()) {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            val cancelToken = cancelTokenSrc.token
+            fusedLocationClient.getCurrentLocation(
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                cancelToken
+            )
+                .addOnSuccessListener { location: Location? ->
+                    if (location != null) {
+                        sharedViewModel.setStartPoint(GeoPoint(location))
+                    } else {
+                        sharedViewModel.setStartPoint(null)
+                    }
+                }
+        } else {
+            sharedViewModel.setStartPoint(null)
         }
-        if (location != null) {
-            return GeoPoint(location)
-        }
-        return null
     }
 
     override fun onCreateView(
@@ -103,7 +116,9 @@ class RoutesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedViewModel.clearData()
+        cancelTokenSrc = CancellationTokenSource()
+
+        sharedViewModel.clearRoutingData()
 
         if (!getLocationPermission()) {
             Toast.makeText(requireContext(), getString(R.string.location_permission_required), Toast.LENGTH_SHORT).show()
@@ -112,14 +127,7 @@ class RoutesFragment : Fragment() {
         }
 
         val roadManager: RoadManager = OSRMRoadManager(requireContext(), userAgent)
-        val userLocation = getUserLocation()
         val id = navigationArgs.itemId
-
-        if (userLocation == null) {
-            Toast.makeText(requireContext(), getString(R.string.location_disabled), Toast.LENGTH_SHORT).show()
-            val action = RoutesFragmentDirections.actionRoutesFragmentToPlacesFragment()
-            findNavController().navigate(action)
-        }
 
         val adapter = RoutesAdapter(requireContext(), sharedViewModel)
         binding.apply {
@@ -129,10 +137,20 @@ class RoutesFragment : Fragment() {
 
         sharedViewModel.retrievePlaceItem(id).observe(this.viewLifecycleOwner) { selectedDestination ->
             sharedViewModel.setDestination(selectedDestination)
-            sharedViewModel.getRoads(userLocation, selectedDestination, roadManager)
+            getPlayServiceLocation()
 
             val destinationName = sharedViewModel.getFormattedDestinationName()
             binding.textViewDestination.text = destinationName
+        }
+
+        sharedViewModel.startPoint.observe(this.viewLifecycleOwner) {
+            if(it == null) {
+                Toast.makeText(requireContext(), getString(R.string.location_unavailable), Toast.LENGTH_SHORT).show()
+                val action = RoutesFragmentDirections.actionRoutesFragmentToPlacesFragment()
+                findNavController().navigate(action)
+            } else {
+                sharedViewModel.getRoads(roadManager)
+            }
         }
 
         sharedViewModel.status.observe(this.viewLifecycleOwner) {
@@ -170,6 +188,8 @@ class RoutesFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cancelTokenSrc.cancel()
+        sharedViewModel.clearLocationData()
         _binding = null
     }
 

@@ -19,7 +19,7 @@
     <string name="camera_error">Kamera Fehler</string>
     <string name="image_permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
     <string name="choose_image">Wähle ein Bild</string>
-    <string name="location_disabled">Standort nicht aktiviert</string>
+    <string name="location_unavailable">Standort nicht verfügbar</string>
     <string name="content_desc_find_location">Standort finden</string>
     <string name="navigation_duration">Dauer</string>
     <string name="difficulty">Schwierigkeit</string>

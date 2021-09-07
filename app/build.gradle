@@ -47,6 +47,9 @@ dependencies {
     // Feature module Support
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
 
+    // GooglePlay location services
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+
     // Room
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"

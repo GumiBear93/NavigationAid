@@ -17,12 +17,16 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class PlacesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
+enum class LocationFetchStatus {FETCHING, WAITING}
 
+class PlacesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
     val allPlaceItems: LiveData<List<PlaceItem>> = itemDao.getPlaceItems().asLiveData()
 
     private var _placeName: MutableLiveData<String?> = MutableLiveData(null)
     val placeName: LiveData<String?> get() = _placeName
+
+    private var _locationStatus: MutableLiveData<LocationFetchStatus> = MutableLiveData(LocationFetchStatus.WAITING)
+    val locationStatus: LiveData<LocationFetchStatus> get() = _locationStatus
 
     private var _placePoint: MutableLiveData<GeoPoint?> = MutableLiveData(null)
     val placePoint: LiveData<GeoPoint?> get() = _placePoint
@@ -156,6 +160,14 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
 
     fun setPlaceName(name: String) {
         _placeName.value = name
+    }
+
+    fun setStatusFetching(isFetching: Boolean) {
+        _locationStatus.value = if (isFetching) {
+            LocationFetchStatus.FETCHING
+        } else {
+            LocationFetchStatus.WAITING
+        }
     }
 
     // attempts to save image to private app location

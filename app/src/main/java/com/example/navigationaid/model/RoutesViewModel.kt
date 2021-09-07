@@ -21,15 +21,21 @@ enum class RouteApiStatus { LOADING, ERROR, DONE }
 class RoutesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
     private val _allRoutes: MutableLiveData<List<RouteItem>> = MutableLiveData(mutableListOf())
     val allRoutes: LiveData<List<RouteItem>> get() = _allRoutes
+
     private val _allRoads: MutableLiveData<Array<Road>> = MutableLiveData(arrayOf())
+
     private val _status: MutableLiveData<RouteApiStatus> = MutableLiveData(RouteApiStatus.LOADING)
     val status: LiveData<RouteApiStatus> get() = _status
+
+    private var _startPoint: MutableLiveData<GeoPoint?> = MutableLiveData()
+    val startPoint: LiveData<GeoPoint?> get() = _startPoint
+
     private var _destination: PlaceItem? = null
-    val destination get() = _destination
+
+    private var _endPoint: GeoPoint? = null
+
     private var _selectedRoute: RouteItem? = null
     val selectedRoute: RouteItem? get() = _selectedRoute
-    private var _startPoint: GeoPoint? = null
-    private var _endPoint: GeoPoint? = null
 
     // show MaterialAlertDialog with Help message
     fun showHelpDialog(activity: Activity, message: String) {
@@ -46,12 +52,11 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         return itemDao.getPlaceItem(id).asLiveData()
     }
 
-    fun getRoads(startPoint: GeoPoint?, destinationItem: PlaceItem, roadManager: RoadManager) {
-        this._startPoint = startPoint
-        this._endPoint = destinationItem.point.toGeoPoint()
-        clearData()
+    fun getRoads(roadManager: RoadManager) {
+        _endPoint = _destination!!.point.toGeoPoint()
+        clearRoutingData()
 
-        val waypoints: ArrayList<GeoPoint> = arrayListOf(this._startPoint!!, this._endPoint!!)
+        val waypoints: ArrayList<GeoPoint> = arrayListOf(_startPoint.value!!, _endPoint!!)
 
         (roadManager as OSRMRoadManager).setMean(OSRMRoadManager.MEAN_BY_FOOT)
         val task = RoadGetter(this)
@@ -77,7 +82,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
             for (road in _allRoads.value!!) {
                 val routeItem = RouteItem(
                     road = road,
-                    startPoint = _startPoint!!,
+                    startPoint = _startPoint.value!!,
                     endPoint = _endPoint!!,
                     duration = road.mDuration,
                     roadDifficulty = RoadDifficulty.DIFFICULTY_5
@@ -88,10 +93,20 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         }
     }
 
-    fun clearData() {
+    fun clearRoutingData() {
         _allRoads.value = arrayOf()
         _allRoutes.value = mutableListOf()
         _status.value = RouteApiStatus.LOADING
+    }
+
+    fun clearLocationData() {
+        _startPoint = MutableLiveData()
+        _endPoint = null
+        _destination = null
+    }
+
+    fun setStartPoint(point: GeoPoint?) {
+        _startPoint.value = point
     }
 
     fun setSelectRoad(route: RouteItem) {
