@@ -46,23 +46,28 @@ class RouteViewerFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpMap(road: Road) {
+        // draw road on map
         val map = binding.map
         val roadOverlay: Polyline = RoadManager.buildRoadOverlay(road)
         map.overlays.add(roadOverlay)
 
+        // prepare marker for start point (location pin)
         val startMarker = Marker(map)
         startMarker.position = road.mNodes.first().mLocation
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         startMarker.icon = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_baseline_location_on_24)
 
+        // prepare marker for destination point (goal flag)
         val endMarker = Marker(map)
         endMarker.position = road.mNodes.last().mLocation
         endMarker.setAnchor(Marker.ANCHOR_LEFT, Marker.ANCHOR_BOTTOM)
         endMarker.icon = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_goal_flag)
 
+        // draw markers on map
         map.overlays.add(startMarker)
         map.overlays.add(endMarker)
 
+        // cause map to display all new items
         map.invalidate()
 
         // disable all user interaction on the map
@@ -84,6 +89,7 @@ class RouteViewerFragment : Fragment() {
         map.zoomToBoundingBox(road.mBoundingBox, false, 128)
     }
 
+    // ask user for storage permission in order to create screenshot that is to be shared
     private fun getExtStoragePermission(): Boolean {
         return if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -101,7 +107,7 @@ class RouteViewerFragment : Fragment() {
         }
     }
 
-    // create file to share screenshot of the
+    // create file and save screen content to share image of chosen route
     private fun shareMap() {
         if (!getExtStoragePermission()) {
             Toast.makeText(requireContext(), getString(R.string.storage_permission_required), Toast.LENGTH_SHORT).show()
@@ -154,6 +160,7 @@ class RouteViewerFragment : Fragment() {
 
         val road = sharedViewModel.selectedRoute!!.road
 
+        // display relevant information of chosen route
         val destinationName = sharedViewModel.getFormattedDestinationName()
         val etaText =
             getString(R.string.estimated_time_of_arrival) + " " + sharedViewModel.getFormattedEta(

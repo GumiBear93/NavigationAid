@@ -17,15 +17,17 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class LocationFetchStatus {FETCHING, WAITING}
+enum class LocationFetchStatus { FETCHING, WAITING }
 
-class PlacesViewModel(application: Application, private val itemDao: ItemDao) : AndroidViewModel(application) {
+class PlacesViewModel(application: Application, private val itemDao: ItemDao) :
+    AndroidViewModel(application) {
     val allPlaceItems: LiveData<List<PlaceItem>> = itemDao.getPlaceItems().asLiveData()
 
     private var _placeName: MutableLiveData<String?> = MutableLiveData(null)
     val placeName: LiveData<String?> get() = _placeName
 
-    private var _locationStatus: MutableLiveData<LocationFetchStatus> = MutableLiveData(LocationFetchStatus.WAITING)
+    private var _locationStatus: MutableLiveData<LocationFetchStatus> =
+        MutableLiveData(LocationFetchStatus.WAITING)
     val locationStatus: LiveData<LocationFetchStatus> get() = _locationStatus
 
     private var _placePoint: MutableLiveData<GeoPoint?> = MutableLiveData(null)
@@ -68,15 +70,14 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     }
 
     // swaps preview images, create new and updated placeItem, call function to update in Database
-    fun updatePlaceItem(
-        oldPlaceItem: PlaceItem,
-        placeItemName: String
+    fun createUpdatedPlaceItem(
+        oldPlaceItem: PlaceItem
     ) {
         deleteImage(oldPlaceItem.imageName)
         saveImage()
         val updatedPlaceItem = getUpdatedPlaceItemEntry(
             oldPlaceItem.id,
-            placeItemName,
+            _placeName.value!!,
             _placePoint.value!!,
             _placeImageName!!
         )
@@ -114,15 +115,16 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     // only call if isEntryValid has returned true!
     // calls saveImage, if successful (_placeImageName has been set) call getNewPlaceItemEntry
     // saves the created PlaceItem in the database with insertPlaceItem
-    fun addNewPlaceItem(placeItemName: String) {
+    fun addNewPlaceItem() {
         saveImage()
         if (_placeImageName != null) {
             val newPlaceItem =
-                getNewPlaceItemEntry(placeItemName, _placePoint.value!!, _placeImageName!!)
+                getNewPlaceItemEntry(_placeName.value!!, _placePoint.value!!, _placeImageName!!)
             insertPlaceItem(newPlaceItem)
         }
     }
 
+    // remove PlaceItem from database and delete image tied to said item
     fun deletePlaceItem(placeItem: PlaceItem) {
         deleteImage(placeItem.imageName)
         viewModelScope.launch {
@@ -131,8 +133,8 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     }
 
     // checks for filled-in name of place, image and geoPoint
-    fun isEntryValid(placeItemName: String): Boolean {
-        if (placeItemName.isBlank() || _placeImage.value == null || _placePoint.value == null) {
+    fun isEntryValid(): Boolean {
+        if (_placeName.value == null || _placeName.value!!.isBlank() || _placeImage.value == null || _placePoint.value == null) {
             return false
         }
         return true
@@ -173,7 +175,8 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) : 
     // attempts to save image to private app location
     private fun saveImage() {
         val context = getApplication<Application>().applicationContext
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "JPEG_${timeStamp}"
         try {
             val fos: FileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)

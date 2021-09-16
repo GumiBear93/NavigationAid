@@ -9,6 +9,7 @@ import com.example.navigationaid.R
 import com.example.navigationaid.data.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
+import okhttp3.internal.userAgent
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -52,7 +53,11 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         return itemDao.getPlaceItem(id).asLiveData()
     }
 
-    fun getRoads(roadManager: RoadManager) {
+    // launch asyncTask to calculate all routes with OSRMRoadManager
+    fun getRoads() {
+        val context = getApplication<Application>().applicationContext
+        val roadManager: RoadManager = OSRMRoadManager(context, userAgent)
+
         _endPoint = _destination!!.point.toGeoPoint()
         clearRoutingData()
 
@@ -66,8 +71,10 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         }
     }
 
+    // wait for asyncTask to launch this method and save the roads, update API status
     fun onRoadTaskCompleted(roadList: Array<Road>) {
         if (roadList.size == 1 && roadList[0].mNodes.isEmpty()) {
+            // default return values of RoadManager when error has occurred
             _allRoads.value = null
             _status.value = RouteApiStatus.ERROR
         } else {
@@ -76,6 +83,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         }
     }
 
+    // pack calculated roads with corresponding points, duration and difficulty into RouteItems
     fun calculateRoutes() {
         if (_allRoads.value != null) {
             val routePlaceholder: MutableList<RouteItem> = mutableListOf()
@@ -146,6 +154,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         }
     }
 
+    // convert duration to minutes and format to "X Minuten" string
     fun getFormattedDuration(duration: Double): String {
         val context = getApplication<Application>().applicationContext
 
@@ -153,6 +162,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         return context.resources.getString(R.string.duration_minutes, minutes.toString())
     }
 
+    // convert duration and format into date with calendar instance
     fun getFormattedEta(duration: Double): String {
         val timeMinutes = (duration / 60).toInt()
         val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -161,6 +171,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         return formatter.format(calendar.time)
     }
 
+    // format destination name into "Ziel: X" string
     fun getFormattedDestinationName(): String {
         val context = getApplication<Application>().applicationContext
 
@@ -185,6 +196,7 @@ class RoutesViewModelFactory(private val application: Application, private val i
 }
 
 class RoadGetter(private val caller: RoutesViewModel) : AsyncTask<Any?, Void?, Array<Road>>() {
+    // calculate roads in background
     @Suppress("UNCHECKED_CAST")
     override fun doInBackground(vararg params: Any?): Array<Road> {
         return try {
@@ -197,6 +209,7 @@ class RoadGetter(private val caller: RoutesViewModel) : AsyncTask<Any?, Void?, A
         }
     }
 
+    // notify viewModel function on calculation completion
     override fun onPostExecute(result: Array<Road>?) {
         caller.onRoadTaskCompleted(result!!)
     }

@@ -26,9 +26,6 @@ import com.example.navigationaid.model.RoutesViewModelFactory
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
-import okhttp3.internal.userAgent
-import org.osmdroid.bonuspack.routing.OSRMRoadManager
-import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.util.GeoPoint
 
 class RoutesFragment : Fragment() {
@@ -126,15 +123,16 @@ class RoutesFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        val roadManager: RoadManager = OSRMRoadManager(requireContext(), userAgent)
         val id = navigationArgs.itemId
 
-        val adapter = RoutesAdapter(requireContext(), sharedViewModel)
+        // initialize recyclerView adapter
+        val adapter = RoutesAdapter(sharedViewModel)
         binding.apply {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
         }
 
+        // fetch destination from database, update UI and look for user location
         sharedViewModel.retrievePlaceItem(id).observe(this.viewLifecycleOwner) { selectedDestination ->
             sharedViewModel.setDestination(selectedDestination)
             getPlayServiceLocation()
@@ -143,16 +141,18 @@ class RoutesFragment : Fragment() {
             binding.textViewDestination.text = destinationName
         }
 
+        // wait for location to be fetched, if successful calculate road with known points
         sharedViewModel.startPoint.observe(this.viewLifecycleOwner) {
             if(it == null) {
                 Toast.makeText(requireContext(), getString(R.string.location_unavailable), Toast.LENGTH_SHORT).show()
                 val action = RoutesFragmentDirections.actionRoutesFragmentToPlacesFragment()
                 findNavController().navigate(action)
             } else {
-                sharedViewModel.getRoads(roadManager)
+                sharedViewModel.getRoads()
             }
         }
 
+        // observe API status of route calculation, update UI accordingly
         sharedViewModel.status.observe(this.viewLifecycleOwner) {
             Log.d(LOG_TAG, "onViewCreated: API Status changed")
             when(it) {
@@ -174,6 +174,7 @@ class RoutesFragment : Fragment() {
             }
         }
 
+        // submit final list of calculated routes, if any have been found
         sharedViewModel.allRoutes.observe(this.viewLifecycleOwner) { routeItems ->
             routeItems.let {
                 if(it.isNotEmpty()) {

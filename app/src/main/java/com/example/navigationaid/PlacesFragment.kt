@@ -24,6 +24,7 @@ class PlacesFragment : Fragment() {
         )
     }
 
+    // display more items in the row in landscape orientation
     private fun setGridLayout(orientation: Int) {
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.recyclerView.layoutManager = GridLayoutManager(this.requireContext(), LANDSCAPE_SPAN)

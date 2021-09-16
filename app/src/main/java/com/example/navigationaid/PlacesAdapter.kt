@@ -33,10 +33,10 @@ class PlacesAdapter(private val filesDir: File, private val title_add: String, p
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         if (position >= currentList.size) {
+            // last element of list is reserved for opening the editor
             holder.textView.setText(R.string.add_new_place)
             holder.imageView.setImageResource(R.drawable.ic_baseline_add_circle_24)
 
-            //clicking last element will open editor for new place
             holder.imageView.setOnClickListener {
                 val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(title_add)
                 it.findNavController().navigate(action)

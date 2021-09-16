@@ -44,8 +44,8 @@ class LocationPickerFragment : Fragment() {
     }
 
     private lateinit var map: MapView
-    private lateinit var mapController: IMapController
-    private lateinit var cancelTokenSrc: CancellationTokenSource
+    private lateinit var mapController: IMapController // control zoom and pan of map
+    private lateinit var cancelTokenSrc: CancellationTokenSource // source for token to send cancellation signal to abort fetching the location
 
     // ask user for location permission
     private fun getLocationPermission(): Boolean {
@@ -141,9 +141,9 @@ class LocationPickerFragment : Fragment() {
         val id = if (navigationArgs.itemId > 0) {
             navigationArgs.itemId
         } else {
-            CANCEL_MAP_NAVIGATION_CODE
+            CANCEL_MAP_NAVIGATION_CODE // instead of using default ID value, pass special code to give place editor the context of user action
         }
-        val title = navigationArgs.title
+        val title = navigationArgs.title // preserve title of place editor, depending on adding or editing a place
         val location = if (sharedViewModel.placePoint.value != null) {
             sharedViewModel.placePoint.value.toString()
         } else {
@@ -165,7 +165,7 @@ class LocationPickerFragment : Fragment() {
         return binding.root
     }
 
-    // prepare map and location manager, bind buttons
+    // prepare map, cancel token and location button, bind button click-listeners
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -177,6 +177,7 @@ class LocationPickerFragment : Fragment() {
 
         cancelTokenSrc = CancellationTokenSource()
 
+        // when not editing a previous place, zoom to default map view over central europe
         if (sharedViewModel.placePoint.value == null) {
             mapController.setCenter(GeoPoint(MAP_DEFAULT_LATITUDE, MAP_DEFAULT_LONGITUDE))
             mapController.setZoom(OVERVIEW_ZOOM)
@@ -185,6 +186,7 @@ class LocationPickerFragment : Fragment() {
             mapController.setZoom(DETAIL_ZOOM)
         }
 
+        // visualize that location needs time to fetch
         sharedViewModel.locationStatus.observe(this.viewLifecycleOwner) { state ->
             if (state == LocationFetchStatus.WAITING) {
                 binding.fabMyLocation.setImageResource(R.drawable.ic_baseline_my_location_24)
@@ -195,7 +197,7 @@ class LocationPickerFragment : Fragment() {
 
         binding.apply {
             fabMyLocation.setOnClickListener {
-                //setLocationAsUserLocation()
+                // user can fetch location or abort fetching, depending of the state of the operation
                 when (sharedViewModel.locationStatus.value) {
                     LocationFetchStatus.WAITING -> {
                         getPlayServiceLocation()

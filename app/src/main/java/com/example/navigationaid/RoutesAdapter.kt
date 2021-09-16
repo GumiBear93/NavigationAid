@@ -1,6 +1,5 @@
 package com.example.navigationaid
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.findNavController
@@ -12,7 +11,6 @@ import com.example.navigationaid.databinding.RouteItemViewBinding
 import com.example.navigationaid.model.RoutesViewModel
 
 class RoutesAdapter(
-    private val context: Context,
     private val sharedViewModel: RoutesViewModel
 ) :
     ListAdapter<RouteItem, RoutesAdapter.RoutesViewHolder>(DiffCallback) {
@@ -24,7 +22,6 @@ class RoutesAdapter(
                     parent.context
                 )
             ),
-            context,
             sharedViewModel
         )
     }
@@ -41,10 +38,10 @@ class RoutesAdapter(
 
     class RoutesViewHolder(
         private var binding: RouteItemViewBinding,
-        private val context: Context,
         private val sharedViewModel: RoutesViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(routeItem: RouteItem) {
+            // load resources and bind them to UI
             val imageResource =
                 sharedViewModel.getDifficultyImageResourceId(routeItem.roadDifficulty)
             val duration = sharedViewModel.getFormattedDuration(routeItem.duration)

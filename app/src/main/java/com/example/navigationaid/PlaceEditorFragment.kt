@@ -31,7 +31,7 @@ class PlaceEditorFragment : Fragment() {
     private var _binding: FragmentPlaceEditorBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var placeItem: PlaceItem
+    private lateinit var placeItem: PlaceItem // item to be fetched from database and passed into viewModel operations
     private val navigationArgs: PlaceEditorFragmentArgs by navArgs()
 
     private val sharedViewModel: PlacesViewModel by activityViewModels {
@@ -41,38 +41,38 @@ class PlaceEditorFragment : Fragment() {
         )
     }
 
-    private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) {
-            sharedViewModel.setPlaceImage(bitmap)
-        }
-    }
-
-    private val getGalleryImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
-            } else {
-                val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
-                ImageDecoder.decodeBitmap(source)
+    // register activity contract for opening camera and saving result in viewModel
+    private val getCameraImage =
+        registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            if (bitmap != null) {
+                sharedViewModel.setPlaceImage(bitmap)
             }
-            sharedViewModel.setPlaceImage(bitmap)
         }
-    }
+
+    // register activity contract to open file browser, decode image uri dependant on device SDK and save result in viewModel
+    private val getGalleryImage =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                    MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+                } else {
+                    val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
+                    ImageDecoder.decodeBitmap(source)
+                }
+                sharedViewModel.setPlaceImage(bitmap)
+            }
+        }
 
     // call ViewModel function to validate user input
     // name is only part of the UI that is not saved in ViewModel
     private fun isEntryValid(): Boolean {
-        return sharedViewModel.isEntryValid(
-            binding.placeName.text.toString()
-        )
+        return sharedViewModel.isEntryValid()
     }
 
     // confirm user input, call ViewModel functions to save input to database, navigate back
     private fun addNewPlaceItem() {
         if (isEntryValid()) {
-            sharedViewModel.addNewPlaceItem(
-                binding.placeName.text.toString()
-            )
+            sharedViewModel.addNewPlaceItem()
             sharedViewModel.resetUserInput()
             val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
             findNavController().navigate(action)
@@ -82,9 +82,8 @@ class PlaceEditorFragment : Fragment() {
     // confirm user input, call ViewModel functions to update PlaceItem in database, navigate back
     private fun updatePlaceItem() {
         if (isEntryValid()) {
-            sharedViewModel.updatePlaceItem(
-                this.placeItem,
-                this.binding.placeName.text.toString()
+            sharedViewModel.createUpdatedPlaceItem(
+                this.placeItem
             )
             sharedViewModel.resetUserInput()
             val action = PlaceEditorFragmentDirections.actionPlaceEditorFragmentToPlacesFragment()
@@ -168,6 +167,7 @@ class PlaceEditorFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    // ask user for confirmation before deleting PlaceItem from database
     private fun showConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext()).setTitle(getString(R.string.delete_confirmation_title))
             .setMessage(getString(R.string.delete_confirmation_message))
@@ -180,6 +180,7 @@ class PlaceEditorFragment : Fragment() {
             .show()
     }
 
+    // call viewModel function to delete PlaceItem
     private fun deletePlace() {
         sharedViewModel.deletePlaceItem(placeItem)
     }
@@ -219,6 +220,7 @@ class PlaceEditorFragment : Fragment() {
         if (id > 0) {
             binding.apply {
                 buttonConfirm.setOnClickListener {
+                    storeTextInput()
                     updatePlaceItem()
                 }
                 buttonDelete.setOnClickListener {
@@ -250,6 +252,7 @@ class PlaceEditorFragment : Fragment() {
         else {
             binding.apply {
                 buttonConfirm.setOnClickListener {
+                    storeTextInput()
                     addNewPlaceItem()
                 }
                 buttonDelete.visibility = View.GONE
@@ -268,6 +271,7 @@ class PlaceEditorFragment : Fragment() {
             }
         }
 
+        // store and preserve text input before switching fragment/ launching activity
         binding.apply {
             buttonCamera.setOnClickListener {
                 storeTextInput()
@@ -281,7 +285,10 @@ class PlaceEditorFragment : Fragment() {
                 storeTextInput()
                 val title = navigationArgs.title
                 val action =
-                    PlaceEditorFragmentDirections.actionPlaceEditorFragmentToLocationPickerFragment(id, title)
+                    PlaceEditorFragmentDirections.actionPlaceEditorFragmentToLocationPickerFragment(
+                        id,
+                        title
+                    )
                 findNavController().navigate(action)
             }
             buttonCancel.setOnClickListener {

@@ -27,6 +27,7 @@ class RouteOverviewFragment : Fragment() {
         )
     }
 
+    // bind all the known info of the selected route to UI elements
     private fun bindInfo() {
         val route = sharedViewModel.selectedRoute!!
 
@@ -62,6 +63,7 @@ class RouteOverviewFragment : Fragment() {
 
         bindInfo()
 
+        // open RouteViewer with selected route
         binding.apply {
             buttonOpenMap.setOnClickListener {
                 val action = RouteOverviewFragmentDirections.actionRouteOverviewFragmentToRouteViewerFragment()
