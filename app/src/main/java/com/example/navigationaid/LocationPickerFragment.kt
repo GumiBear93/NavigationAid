@@ -221,7 +221,11 @@ class LocationPickerFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cancelTokenSrc.cancel()
+        try {
+            cancelTokenSrc.cancel()
+        } catch (e: Exception) {
+            Log.d(LOG_TAG, "onDestroy: $e")
+        }
         _binding = null
     }
 
