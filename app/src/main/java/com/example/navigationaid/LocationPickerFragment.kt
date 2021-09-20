@@ -26,7 +26,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
 import org.osmdroid.api.IMapController
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
@@ -170,7 +169,6 @@ class LocationPickerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         map = binding.map
-        map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
 
         mapController = map.controller
