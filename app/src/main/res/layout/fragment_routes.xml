@@ -33,15 +33,15 @@
         android:id="@+id/text_view_duration_label"
         style="@style/Widget.Inventory.Header"
         android:text="@string/navigation_duration"
-        app:layout_constraintEnd_toStartOf="@id/text_view_difficulty_label"
+        app:layout_constraintEnd_toStartOf="@id/text_view_distance_label"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/image_view_path"
         app:layout_constraintTop_toBottomOf="@id/text_view_destination" />
 
     <TextView
-        android:id="@+id/text_view_difficulty_label"
+        android:id="@+id/text_view_distance_label"
         style="@style/Widget.Inventory.Header"
-        android:text="@string/difficulty"
+        android:text="@string/navigation_distance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/text_view_duration_label"

@@ -27,20 +27,21 @@
         android:textSize="17sp"
         android:gravity="center"
         app:layout_constraintStart_toEndOf="@id/text_view_item_number"
-        app:layout_constraintEnd_toStartOf="@id/image_view_difficulty"
+        app:layout_constraintEnd_toStartOf="@id/text_view_distance"
         app:layout_constraintHorizontal_weight="1"
         tools:text="42 Minuten"/>
 
-    <ImageView
-        android:id="@+id/image_view_difficulty"
+    <TextView
+        android:id="@+id/text_view_distance"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:padding="@dimen/padding"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="17sp"
+        android:gravity="center"
         app:layout_constraintStart_toEndOf="@id/text_view_duration"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
-        tools:src="@drawable/ic_difficulty_5"
-        tools:ignore="ContentDescription"/>
+        tools:text="4.2 Kilometer"/>
 
     <View
         android:id="@+id/divider"

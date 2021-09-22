@@ -8,13 +8,5 @@ data class RouteItem(
     val startPoint: GeoPoint,
     val endPoint: GeoPoint,
     val duration: Double,
-    val roadDifficulty: RoadDifficulty
+    val distance: Double
 )
-
-enum class RoadDifficulty {
-    DIFFICULTY_1,
-    DIFFICULTY_2,
-    DIFFICULTY_3,
-    DIFFICULTY_4,
-    DIFFICULTY_5
-}

@@ -75,6 +75,9 @@ class RouteViewerFragment : Fragment() {
             true
         }
 
+        // avoid tile loading error when map window is zoomed in too close
+        map.maxZoomLevel = MAX_ZOOM_LEVEL
+
         lifecycleScope.launch {
             waitForRouteZoom()
         }
@@ -207,5 +210,6 @@ class RouteViewerFragment : Fragment() {
 
     companion object {
         private const val URI_PERMISSION_CODE = 1
+        private const val MAX_ZOOM_LEVEL = 19.0
     }
 }

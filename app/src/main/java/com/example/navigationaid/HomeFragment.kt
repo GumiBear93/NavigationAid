@@ -39,11 +39,6 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_placesFragment)
         }
 
-        //take user to take Quiz in QuizContainerFragment
-        binding.buttonTakeQuiz.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_quizContainerFragment)
-        }
-
         setHasOptionsMenu(true)
     }
 

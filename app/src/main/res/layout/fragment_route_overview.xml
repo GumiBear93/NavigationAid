@@ -38,7 +38,7 @@
             <TextView
                 android:id="@+id/text_view_duration"
                 style="@style/RouteInfoLayoutText"
-                tools:text="20 Minuten" />
+                tools:text="42 Minuten" />
 
         </LinearLayout>
 
@@ -87,16 +87,12 @@
 
             <TextView
                 style="@style/RouteInfoLayoutText"
-                android:text="@string/difficulty" />
+                android:text="@string/navigation_distance" />
 
-            <ImageView
-                android:id="@+id/image_view_difficulty"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                tools:ignore="ContentDescription"
-                tools:src="@drawable/ic_difficulty_5" />
+            <TextView
+                android:id="@+id/text_view_distance"
+                style="@style/RouteInfoLayoutText"
+                tools:text="4.2 Kilometer" />
 
         </LinearLayout>
 

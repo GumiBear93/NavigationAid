@@ -34,15 +34,13 @@ class RouteOverviewFragment : Fragment() {
         val destinationText = sharedViewModel.getFormattedDestinationName()
         val durationText = sharedViewModel.getFormattedDuration(route.duration)
         val eta = sharedViewModel.getFormattedEta(route.duration)
-        val difficultyImageResourceId = sharedViewModel.getDifficultyImageResourceId(route.roadDifficulty)
-        val difficultyDescription = sharedViewModel.getDifficultyImageDescription(route.roadDifficulty)
+        val distance = sharedViewModel.getFormattedDistance(route.distance)
 
         binding.apply {
             textViewDestination.text = destinationText
             textViewDuration.text = durationText
             textViewEta.text = eta
-            imageViewDifficulty.setImageResource(difficultyImageResourceId)
-            imageViewDifficulty.contentDescription = difficultyDescription
+            textViewDistance.text = distance
         }
     }
 

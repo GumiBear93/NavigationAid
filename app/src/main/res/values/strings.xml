@@ -22,9 +22,11 @@
     <string name="location_unavailable">Standort nicht verfügbar</string>
     <string name="content_desc_find_location">Standort finden</string>
     <string name="navigation_duration">Dauer</string>
-    <string name="difficulty">Schwierigkeit</string>
+    <string name="navigation_distance">Distanz</string>
+    <string name="distance_meters">%s Meter</string>
+    <string name="distance_kilometers">%s Kilometer</string>
     <string name="location_permission_required">Erlaubnis für Standort nötig</string>
-    <string name="duration_minutes">"%s Minuten"</string>
+    <string name="duration_minutes">%s Minuten</string>
     <string name="map_fragment_title">Wähle einen Standort</string>
     <string name="routes_fragment_title">Routen</string>
     <string name="quiz_container_fragment_title">Quiz</string>

@@ -13,9 +13,6 @@
         <action
             android:id="@+id/action_homeFragment_to_placesFragment"
             app:destination="@id/placesFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_quizContainerFragment"
-            app:destination="@id/quizContainerFragment" />
     </fragment>
     <fragment
         android:id="@+id/placesFragment"
@@ -55,11 +52,6 @@
             android:id="@+id/action_placeEditorFragment_to_locationPickerFragment"
             app:destination="@id/locationPickerFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/quizContainerFragment"
-        android:name="com.example.navigationaid.QuizContainerFragment"
-        android:label="@string/quiz_container_fragment_title"
-        tools:layout="@layout/fragment_quiz_container" />
     <fragment
         android:id="@+id/routeOverviewFragment"
         android:name="com.example.navigationaid.RouteOverviewFragment"

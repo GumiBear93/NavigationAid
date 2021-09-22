@@ -42,17 +42,13 @@ class RoutesAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(routeItem: RouteItem) {
             // load resources and bind them to UI
-            val imageResource =
-                sharedViewModel.getDifficultyImageResourceId(routeItem.roadDifficulty)
             val duration = sharedViewModel.getFormattedDuration(routeItem.duration)
-            val imageDescription =
-                sharedViewModel.getDifficultyImageDescription(routeItem.roadDifficulty)
+            val distance = sharedViewModel.getFormattedDistance(routeItem.distance)
 
             binding.apply {
                 textViewItemNumber.text = (adapterPosition + 1).toString()
                 textViewDuration.text = duration
-                imageViewDifficulty.setImageResource(imageResource)
-                imageViewDifficulty.contentDescription = imageDescription
+                textViewDistance.text = distance
             }
 
         }

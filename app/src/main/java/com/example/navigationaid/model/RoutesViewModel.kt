@@ -6,7 +6,10 @@ import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.navigationaid.R
-import com.example.navigationaid.data.*
+import com.example.navigationaid.data.ItemDao
+import com.example.navigationaid.data.PlaceItem
+import com.example.navigationaid.data.RouteItem
+import com.example.navigationaid.data.toGeoPoint
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import okhttp3.internal.userAgent
@@ -14,6 +17,7 @@ import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.util.GeoPoint
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -93,7 +97,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
                     startPoint = _startPoint.value!!,
                     endPoint = _endPoint!!,
                     duration = road.mDuration,
-                    roadDifficulty = RoadDifficulty.DIFFICULTY_5
+                    distance = road.mLength
                 )
                 routePlaceholder.add(routeItem)
             }
@@ -125,33 +129,19 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         _destination = placeItem
     }
 
-    fun getDifficultyImageResourceId(difficulty: RoadDifficulty): Int {
-        return when (difficulty) {
-            RoadDifficulty.DIFFICULTY_1 -> R.drawable.ic_difficulty_1
-            RoadDifficulty.DIFFICULTY_2 -> R.drawable.ic_difficulty_2
-            RoadDifficulty.DIFFICULTY_3 -> R.drawable.ic_difficulty_3
-            RoadDifficulty.DIFFICULTY_4 -> R.drawable.ic_difficulty_4
-            else -> R.drawable.ic_difficulty_5
-        }
-    }
-
-    fun getDifficultyImageDescription(difficulty: RoadDifficulty): String {
+    fun getFormattedDistance(distance: Double): String {
         val context = getApplication<Application>().applicationContext
+        val formatter = DecimalFormat("#.##")
 
-        val difficultyDescriptions = arrayOf(
-            context.resources.getString(R.string.description_difficulty_1),
-            context.resources.getString(R.string.description_difficulty_2),
-            context.resources.getString(R.string.description_difficulty_3),
-            context.resources.getString(R.string.description_difficulty_4),
-            context.resources.getString(R.string.description_difficulty_5)
-        )
-        return when (difficulty) {
-            RoadDifficulty.DIFFICULTY_1 -> difficultyDescriptions[0]
-            RoadDifficulty.DIFFICULTY_2 -> difficultyDescriptions[1]
-            RoadDifficulty.DIFFICULTY_3 -> difficultyDescriptions[2]
-            RoadDifficulty.DIFFICULTY_4 -> difficultyDescriptions[3]
-            else -> difficultyDescriptions[4]
+        val formattedDistance = if (distance < 1.0) {
+            val meters = formatter.format(distance * 1000)
+            context.resources.getString(R.string.distance_meters, meters)
+        } else {
+            val kilometers = formatter.format(distance)
+            context.resources.getString(R.string.distance_kilometers, kilometers)
         }
+
+        return formattedDistance
     }
 
     // convert duration to minutes and format to "X Minuten" string
