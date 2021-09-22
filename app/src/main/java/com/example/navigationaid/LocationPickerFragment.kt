@@ -244,7 +244,7 @@ class LocationPickerFragment : Fragment() {
         private const val LOG_TAG = "MapFragment"
         private const val FINE_LOCATION_PERMISSION_CODE = 1
         private const val COARSE_LOCATION_PERMISSION_CODE = 2
-        private const val DETAIL_ZOOM = 20.0
+        private const val DETAIL_ZOOM = 19.0
         private const val OVERVIEW_ZOOM = 5.0
         private const val MAP_DEFAULT_LATITUDE = 50.0
         private const val MAP_DEFAULT_LONGITUDE = 10.0
