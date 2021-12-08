@@ -231,7 +231,7 @@ class LocationPickerFragment : Fragment() {
         if (item.itemId == R.id.help_menu) {
             sharedViewModel.showHelpDialog(
                 requireActivity(),
-                getString(R.string.help_location_picker)
+                R.string.help_location_picker
             )
             return true
         }

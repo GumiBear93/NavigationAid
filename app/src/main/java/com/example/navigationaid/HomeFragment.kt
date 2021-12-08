@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
-            sharedViewModel.showHelpDialog(requireActivity(), getString(R.string.help_home))
+            sharedViewModel.showHelpDialog(requireActivity(), R.string.help_home)
             return true
         }
 

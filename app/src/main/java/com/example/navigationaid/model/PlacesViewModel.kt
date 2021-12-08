@@ -4,7 +4,10 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.widget.TextView
+import androidx.core.view.setPadding
 import androidx.lifecycle.*
 import com.example.navigationaid.R
 import com.example.navigationaid.data.ItemDao
@@ -39,11 +42,18 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) :
     private var _placeImageName: String? = null
 
     // show MaterialAlertDialog with Help message
-    fun showHelpDialog(activity: Activity, message: String) {
-        MaterialAlertDialogBuilder(activity)
+    fun showHelpDialog(activity: Activity, textId: Int) {
+        val context = getApplication<Application>().applicationContext
+        val textView = TextView(context)
+        textView.setText(textId)
+        textView.setPadding(context.resources.getDimensionPixelSize(R.dimen.padding))
+        textView.movementMethod = ScrollingMovementMethod()
+
+        MaterialAlertDialogBuilder(activity, R.style.MyAlertDialogStyle)
             .setTitle("Hilfe:")
             .setIcon(R.drawable.ic_baseline_help_24)
-            .setMessage(message)
+            .setView(textView)
+            //.setMessage(message)
             .setPositiveButton("Okay") { _, _ -> }
             .show()
     }

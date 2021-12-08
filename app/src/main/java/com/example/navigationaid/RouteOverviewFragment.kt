@@ -81,7 +81,7 @@ class RouteOverviewFragment : Fragment() {
         if (item.itemId == R.id.help_menu) {
             sharedViewModel.showHelpDialog(
                 requireActivity(),
-                getString(R.string.help_route_overview)
+                R.string.help_route_overview
             )
             return true
         }

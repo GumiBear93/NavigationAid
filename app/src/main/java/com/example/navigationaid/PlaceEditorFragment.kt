@@ -314,7 +314,7 @@ class PlaceEditorFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
-            sharedViewModel.showHelpDialog(requireActivity(), getString(R.string.help_place_editor))
+            sharedViewModel.showHelpDialog(requireActivity(), R.string.help_place_editor)
             return true
         }
 
