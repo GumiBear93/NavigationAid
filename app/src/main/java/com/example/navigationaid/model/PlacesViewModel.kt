@@ -4,8 +4,8 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.setPadding
 import androidx.lifecycle.*
@@ -45,16 +45,17 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) :
     fun showHelpDialog(activity: Activity, textId: Int) {
         val context = getApplication<Application>().applicationContext
         val textView = TextView(context)
+        val scrollView = ScrollView(context)
         textView.setText(textId)
         textView.setPadding(context.resources.getDimensionPixelSize(R.dimen.padding))
-        textView.movementMethod = ScrollingMovementMethod()
+        scrollView.addView(textView)
+        scrollView.isScrollbarFadingEnabled = false
 
         MaterialAlertDialogBuilder(activity, R.style.MyAlertDialogStyle)
-            .setTitle("Hilfe:")
+            .setTitle(R.string.help_dialog_title)
             .setIcon(R.drawable.ic_baseline_help_24)
-            .setView(textView)
-            //.setMessage(message)
-            .setPositiveButton("Okay") { _, _ -> }
+            .setPositiveButton(R.string.help_dialog_okay, null)
+            .setView(scrollView)
             .show()
     }
 

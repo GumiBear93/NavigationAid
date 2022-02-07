@@ -105,7 +105,7 @@ class LocationPickerFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.location_unavailable),
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_LONG
                         ).show()
                     }
                 }
@@ -116,7 +116,7 @@ class LocationPickerFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.location_unavailable),
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_LONG
             ).show()
         }
     }
@@ -170,6 +170,9 @@ class LocationPickerFragment : Fragment() {
 
         map = binding.map
         map.setMultiTouchControls(true)
+
+        // scale text to be readable
+        map.isTilesScaledToDpi = true
 
         mapController = map.controller
 

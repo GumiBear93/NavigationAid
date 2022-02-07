@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -67,6 +68,19 @@ class PlaceEditorFragment : Fragment() {
     // name is only part of the UI that is not saved in ViewModel
     private fun isEntryValid(): Boolean {
         return sharedViewModel.isEntryValid()
+    }
+
+    // grey out confirm button if information is not complete
+    private fun toggleConfirmAvailability() {
+        val oldButtonState = binding.buttonConfirm.isClickable
+        if (isEntryValid() != oldButtonState) {
+            binding.buttonConfirm.isClickable = !oldButtonState
+            binding.buttonConfirm.alpha = if (!oldButtonState) {
+                1.0f
+            } else {
+                0.5f
+            }
+        }
     }
 
     // confirm user input, call ViewModel functions to save input to database, navigate back
@@ -134,9 +148,7 @@ class PlaceEditorFragment : Fragment() {
 
     // save name when navigating into Map, Camera or Gallery
     private fun storeTextInput() {
-        if (binding.placeName.text.toString().isNotEmpty()) {
-            sharedViewModel.setPlaceName(binding.placeName.text.toString())
-        }
+        sharedViewModel.setPlaceName(binding.placeName.text.toString())
     }
 
     // binding all known PlaceItem properties to UI and prepare to edit item
@@ -220,7 +232,6 @@ class PlaceEditorFragment : Fragment() {
         if (id > 0) {
             binding.apply {
                 buttonConfirm.setOnClickListener {
-                    storeTextInput()
                     updatePlaceItem()
                 }
                 buttonDelete.setOnClickListener {
@@ -252,7 +263,6 @@ class PlaceEditorFragment : Fragment() {
         else {
             binding.apply {
                 buttonConfirm.setOnClickListener {
-                    storeTextInput()
                     addNewPlaceItem()
                 }
                 buttonDelete.visibility = View.GONE
@@ -274,15 +284,12 @@ class PlaceEditorFragment : Fragment() {
         // store and preserve text input before switching fragment/ launching activity
         binding.apply {
             buttonCamera.setOnClickListener {
-                storeTextInput()
                 openCamera()
             }
             buttonGallery.setOnClickListener {
-                storeTextInput()
                 openGallery()
             }
             buttonMap.setOnClickListener {
-                storeTextInput()
                 val title = navigationArgs.title
                 val action =
                     PlaceEditorFragmentDirections.actionPlaceEditorFragmentToLocationPickerFragment(
@@ -294,7 +301,13 @@ class PlaceEditorFragment : Fragment() {
             buttonCancel.setOnClickListener {
                 cancelUserInput()
             }
+            placeNameInput.editText?.doAfterTextChanged {
+                storeTextInput()
+                toggleConfirmAvailability()
+            }
         }
+
+        toggleConfirmAvailability()
 
         setHasOptionsMenu(true)
     }

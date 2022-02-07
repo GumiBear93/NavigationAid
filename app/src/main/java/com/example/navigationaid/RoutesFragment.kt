@@ -144,7 +144,7 @@ class RoutesFragment : Fragment() {
         // wait for location to be fetched, if successful calculate road with known points
         sharedViewModel.startPoint.observe(this.viewLifecycleOwner) {
             if(it == null) {
-                Toast.makeText(requireContext(), getString(R.string.location_unavailable), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.location_unavailable), Toast.LENGTH_LONG).show()
                 val action = RoutesFragmentDirections.actionRoutesFragmentToPlacesFragment()
                 findNavController().navigate(action)
             } else {

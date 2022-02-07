@@ -4,7 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="my_places">Meine Orte</string>
     <string name="take_quiz">Quiz nehmen</string>
-    <string name="hint">Hilfestellung</string>
+    <string name="help_hint">Hilfestellung</string>
     <string name="add_new_place">Neuen Ort hinzufügen</string>
     <string name="edit_place">Ort bearbeiten</string>
     <string name="place_name_req">Name des Ortes <font color='#FF0000'>*</font></string>
@@ -15,6 +15,8 @@
     <string name="place_chosen">Ort ausgewählt</string>
     <string name="cancel">Abbrechen</string>
     <string name="done">Fertig</string>
+    <string name="help_dialog_title">Hilfe:</string>
+    <string name="help_dialog_okay">Okay</string>
     <string name="content_desc_place_preview">Vorschau für Ort</string>
     <string name="camera_error">Kamera Fehler</string>
     <string name="image_permission_required">Erlaubnis notwendig zum Erstellen personalisierter Orte</string>
@@ -52,7 +54,7 @@
     <string name="delete_confirmation_message">Löschen eines Ortes kann nicht rückgängig gemacht werden. Bist du sicher?</string>
 
     <!-- HELP STRINGS -->
-    <string name="help_home">Wilkommen bei NavigationAid!\nMit dieser App erreichen Sie ohne Umwege all die Orte, die Ihnen wichtig sind.\n\n<font color='#004C8C'><b>Meine Orte</b></font>\nHier sehen Sie die Liste Ihrer Orte.\n\nBenötigen Sie Hilfe, tippen Sie auf das \"?\" in der oberen rechten Ecke Ihres Bildschirms.</string>
+    <string name="help_home">Wilkommen bei NavigationAid!\nMit dieser App erreichen Sie ohne Umwege all die Orte, die Ihnen wichtig sind.\n\n<font color='#004C8C'><b>Meine Orte</b></font>\nHier sehen Sie die Liste Ihrer Orte.\n\nBenötigen Sie Hilfe, tippen Sie auf das <font color='#004C8C'>Fragezeichen <b>(?)</b></font> in der oberen rechten Ecke Ihres Bildschirms.</string>
     <string name="help_location_picker">Auf dieser Karte bestimmen Sie, wo sich der Ort befindet.\n\n<b>Karte bedienen</b>\nVerschieben Sie den roten Marker, indem Sie Ihren Finger über die Karte ziehen.\nZiehen Sie zwei Finger auf dem Bildschirm zueinander oder auseinander, um die Ansicht zu vergrößern und verkleinern.\n\n<font color='#519657'><b>Standort automatisch finden</b></font>\nAktivieren Sie die Standort-Funktion Ihres Geräts und tippen sie auf die runde Schaltfläche unten rechts.</string>
     <string name="help_place_editor">Hier bearbeiten und speichern Sie all Ihre Orte.\n\n<font color='#004C8C'><b>Kamera/ Galerie</b></font>\nWählen Sie ein geeignetes Bild um Ihren Ort in der Liste darzustellen.\nNehmen Sie es mit der Kamera auf, oder wählen Sie ein Bild von Ihrem Gerät.\n\n<b>Name des Ortes</b>\nGeben Sie eine kurze Beschreibung oder einen einfachen Namen ein.\nDieser Name wird in der Liste angezeigt.\n\n<font color='#004C8C'><b>Karte öffnen</b></font>\nIn der Karte wählen Sie den Standort. Am besten geschieht dies direkt an dem Ort, den Sie abspeichern möchten.\n\n<font color='#FF0000'><b>Ort löschen</b></font>\nTippen Sie diesen Knopf, um den Ort aus Ihrer Liste zu entfernen.\n<font color='#FF0000'>Achtung:</font> Dies kann nicht rückgängig gemacht werden!</string>
     <string name="help_places">Hier sind alle Orte abgebildet, die Sie gespeichert haben.\n\nMöchten Sie einen dieser Orte besuchen, tippen Sie ihn kurz an.\nBearbeiten Sie einen Ort durch langes antippen.\n\n<b>\"+\" - Schaltfläche</b>\nMit einem Klick auf das \"+\" erstellen Sie einen neuen Eintrag.</string>

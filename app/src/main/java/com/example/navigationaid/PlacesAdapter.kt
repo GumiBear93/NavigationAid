@@ -57,6 +57,8 @@ class PlacesAdapter(private val filesDir: File, private val title_add: String, p
                 true
             }
         }
+
+        holder.imageView.contentDescription = holder.textView.text
     }
 
     class PlaceViewHolder(private var binding: PlaceItemViewBinding) : RecyclerView.ViewHolder(binding.root) {

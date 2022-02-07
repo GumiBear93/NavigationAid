@@ -51,6 +51,9 @@ class RouteViewerFragment : Fragment() {
         val roadOverlay: Polyline = RoadManager.buildRoadOverlay(road)
         map.overlays.add(roadOverlay)
 
+        // scale text to be readable
+        map.isTilesScaledToDpi = true
+
         // prepare marker for start point (location pin)
         val startMarker = Marker(map)
         startMarker.position = road.mNodes.first().mLocation
