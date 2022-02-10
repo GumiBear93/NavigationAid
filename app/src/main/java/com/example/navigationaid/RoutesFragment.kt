@@ -20,15 +20,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.navigationaid.databinding.FragmentRoutesBinding
-import com.example.navigationaid.model.RouteApiStatus
-import com.example.navigationaid.model.RoutesViewModel
-import com.example.navigationaid.model.RoutesViewModelFactory
+import com.example.navigationaid.model.*
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
 import org.osmdroid.util.GeoPoint
 
-class RoutesFragment : Fragment() {
+class RoutesFragment : Fragment(), RoutesAdapter.OnItemClickListener {
     private var _binding: FragmentRoutesBinding? = null
     private val binding get() = _binding!!
 
@@ -40,6 +38,12 @@ class RoutesFragment : Fragment() {
         RoutesViewModelFactory(
             activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private val dataViewModel: StudyDataViewModel by activityViewModels {
+        StudyDataViewModelFactory(
+            activity?.application as NavigationAidApplication
         )
     }
 
@@ -126,7 +130,7 @@ class RoutesFragment : Fragment() {
         val id = navigationArgs.itemId
 
         // initialize recyclerView adapter
-        val adapter = RoutesAdapter(sharedViewModel)
+        val adapter = RoutesAdapter(sharedViewModel, this)
         binding.apply {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -198,8 +202,13 @@ class RoutesFragment : Fragment() {
         _binding = null
     }
 
+    override fun onItemClicked() {
+        dataViewModel.actionTrigger("$N_FRAGMENT.$N_BUT_ROUTE")
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
+            dataViewModel.actionTrigger("${N_FRAGMENT}.${N_MEN_HELP}")
             sharedViewModel.showHelpDialog(requireActivity(), R.string.help_routes)
             return true
         }
@@ -211,5 +220,9 @@ class RoutesFragment : Fragment() {
         private const val LOG_TAG = "RoutesFragment"
         private const val FINE_LOCATION_PERMISSION_CODE = 1
         private const val COARSE_LOCATION_PERMISSION_CODE = 2
+
+        private const val N_MEN_HELP = "HelpMenu"
+        private const val N_FRAGMENT = "RoutesFragment"
+        private const val N_BUT_ROUTE = "Route"
     }
 }

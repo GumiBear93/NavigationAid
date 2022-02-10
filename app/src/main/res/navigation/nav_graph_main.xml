@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_placesFragment"
             app:destination="@id/placesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_studyManagerFragment"
+            app:destination="@id/studyManagerFragment" />
     </fragment>
     <fragment
         android:id="@+id/placesFragment"
@@ -51,6 +54,11 @@
         <action
             android:id="@+id/action_placeEditorFragment_to_locationPickerFragment"
             app:destination="@id/locationPickerFragment" />
+        <action
+            android:id="@+id/action_placeEditorFragment_to_studyIntermissionFragment"
+            app:destination="@id/studyIntermissionFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/routeOverviewFragment"
@@ -63,6 +71,11 @@
         <action
             android:id="@+id/action_routeOverviewFragment_to_routeViewerFragment"
             app:destination="@id/routeViewerFragment" />
+        <action
+            android:id="@+id/action_routeOverviewFragment_to_studyIntermissionFragment"
+            app:destination="@id/studyIntermissionFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/routesFragment"
@@ -103,4 +116,32 @@
         android:name="com.example.navigationaid.RouteViewerFragment"
         android:label="@string/route_viewer_fragment_title"
         tools:layout="@layout/fragment_route_viewer" />
+    <fragment
+        android:id="@+id/studyManagerFragment"
+        android:name="com.example.navigationaid.StudyManagerFragment"
+        android:label="@string/study_manager_fragment_title">
+        <action
+            android:id="@+id/action_studyManagerFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_studyManagerFragment_to_studyIntermissionFragment"
+            app:destination="@id/studyIntermissionFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/studyIntermissionFragment"
+        android:name="com.example.navigationaid.StudyIntermissionFragment"
+        android:label="@string/study_intermission_fragment_title" >
+        <action
+            android:id="@+id/action_studyIntermissionFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/studyIntermissionFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_studyIntermissionFragment_to_studyManagerFragment"
+            app:destination="@id/studyManagerFragment"
+            app:popUpTo="@id/studyIntermissionFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
 </navigation>

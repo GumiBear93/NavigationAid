@@ -12,8 +12,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.navigationaid.databinding.FragmentPlacesBinding
 import com.example.navigationaid.model.PlacesViewModel
 import com.example.navigationaid.model.PlacesViewModelFactory
+import com.example.navigationaid.model.StudyDataViewModel
+import com.example.navigationaid.model.StudyDataViewModelFactory
 
-class PlacesFragment : Fragment() {
+class PlacesFragment : Fragment(), PlacesAdapter.OnItemClickListener {
     private var _binding: FragmentPlacesBinding? = null
     private val binding get() = _binding!!
 
@@ -21,6 +23,12 @@ class PlacesFragment : Fragment() {
         PlacesViewModelFactory(
             activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private val dataViewModel: StudyDataViewModel by activityViewModels {
+        StudyDataViewModelFactory(
+            activity?.application as NavigationAidApplication
         )
     }
 
@@ -44,7 +52,7 @@ class PlacesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = PlacesAdapter(requireContext().filesDir, getString(R.string.add_new_place), getString(R.string.edit_place))
+        val adapter = PlacesAdapter(requireContext().filesDir, getString(R.string.add_new_place), getString(R.string.edit_place), this)
         binding.recyclerView.adapter = adapter
         sharedViewModel.allPlaceItems.observe(this.viewLifecycleOwner) { placeItems ->
             placeItems.let {
@@ -72,6 +80,7 @@ class PlacesFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
+            dataViewModel.actionTrigger("$N_FRAGMENT.$N_MEN_HELP")
             sharedViewModel.showHelpDialog(requireActivity(), R.string.help_places)
             return true
         }
@@ -79,8 +88,15 @@ class PlacesFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onItemClicked(name: String) {
+        dataViewModel.actionTrigger("$N_FRAGMENT.$name")
+    }
+
     companion object {
         private const val LANDSCAPE_SPAN = 3
         private const val PORTRAIT_SPAN = 2
+
+        private const val N_MEN_HELP = "HelpMenu"
+        private const val N_FRAGMENT = "PlacesFragment"
     }
 }

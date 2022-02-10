@@ -23,6 +23,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.navigationaid.databinding.FragmentRouteViewerBinding
 import com.example.navigationaid.model.RoutesViewModel
 import com.example.navigationaid.model.RoutesViewModelFactory
+import com.example.navigationaid.model.StudyDataViewModel
+import com.example.navigationaid.model.StudyDataViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.routing.Road
@@ -41,6 +43,12 @@ class RouteViewerFragment : Fragment() {
         RoutesViewModelFactory(
             activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private val dataViewModel: StudyDataViewModel by activityViewModels {
+        StudyDataViewModelFactory(
+            activity?.application as NavigationAidApplication
         )
     }
 
@@ -177,6 +185,7 @@ class RouteViewerFragment : Fragment() {
             textViewEta.text = etaText
             textViewDestination.text = destinationName
             fabShareMap.setOnClickListener {
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_FAB_SHARE_MAP")
                 fabShareMap.visibility = View.GONE
                 shareMap()
                 fabShareMap.visibility = View.VISIBLE
@@ -204,6 +213,7 @@ class RouteViewerFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
+            dataViewModel.actionTrigger("${N_FRAGMENT}.${N_MEN_HELP}")
             sharedViewModel.showHelpDialog(requireActivity(), R.string.help_route_viewer)
             return true
         }
@@ -214,5 +224,9 @@ class RouteViewerFragment : Fragment() {
     companion object {
         private const val URI_PERMISSION_CODE = 1
         private const val MAX_ZOOM_LEVEL = 19.0
+
+        private const val N_MEN_HELP = "HelpMenu"
+        private const val N_FRAGMENT = "RouteViewerFragment"
+        private const val N_FAB_SHARE_MAP = "FabShareMap"
     }
 }

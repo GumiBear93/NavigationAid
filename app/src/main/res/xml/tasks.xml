@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <task id = "0" name = "saveNewPlace">
+        <params>
+            <param0 name="placeName">zuhause</param0>
+        </params>
+        <desc>Speicheren Sie ihren Aufenthaltsort ab</desc>
+    </task>
+    <task id = "1" name = "startNavigation">
+        <params>
+            <param0 name="placeId">4</param0>
+        </params>
+        <desc>Starten Sie die Navigation zum genannten Ort</desc>
+    </task>
+    <task id = "2" name = "editPlaceName">
+        <params>
+            <param0 name="placeId">4</param0>
+            <param1 name="placeName">Roter Turm</param1>
+        </params>
+        <desc>Benennen Sie den genannten Ort um.</desc>
+    </task>
+</resources>

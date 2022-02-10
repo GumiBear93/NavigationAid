@@ -52,6 +52,20 @@
     <string name="storage_permission_required">Speicherfreigabe notwendig</string>
     <string name="delete_confirmation_title">Achtung</string>
     <string name="delete_confirmation_message">Löschen eines Ortes kann nicht rückgängig gemacht werden. Bist du sicher?</string>
+    <string name="start_study">Studie starten</string>
+    <string name="study_label_id">ID</string>
+    <string name="study_label_name">Name</string>
+    <string name="study_label_age">Alter</string>
+    <string name="study_label_gender">Geschlecht</string>
+    <string name="study_label_male_gender">Männlich</string>
+    <string name="study_label_female_gender">Weiblich</string>
+    <string name="study_label_diverse_gender">Divers</string>
+    <string name="study_label_frequency">wöchentliche Techniknutzung</string>
+    <string name="study_label_variety">Vielfältigkeit der Techniknutzung</string>
+    <string name="button_upload">hochladen</string>
+    <string name="button_end_study">Studie beenden</string>
+    <string name="study_manager_fragment_title">Studien-Übersicht</string>
+    <string name="button_start_task_number">Aufgabe %s starten</string>
 
     <!-- HELP STRINGS -->
     <string name="help_home">Wilkommen bei NavigationAid!\nMit dieser App erreichen Sie ohne Umwege all die Orte, die Ihnen wichtig sind.\n\n<font color='#004C8C'><b>Meine Orte</b></font>\nHier sehen Sie die Liste Ihrer Orte.\n\nBenötigen Sie Hilfe, tippen Sie auf das <font color='#004C8C'>Fragezeichen <b>(?)</b></font> in der oberen rechten Ecke Ihres Bildschirms.</string>
@@ -61,4 +75,8 @@
     <string name="help_route_overview">Hier ist ein letzter Überblick, bevor die Navigation beginnt.\n\n<b>Dauer, Ankunftszeit &amp; Distanz</b>\nSie sehen, wie lange Sie unterwegs sind, und wann Sie das Ziel erreichen.\n<font color='#FF0000'>Achtung:</font> Die zeitlichen Angaben sind nur Schätzungen, und unterscheiden sich für jeden Nutzer.\n\n<font color='#004C8C'><b>Auf Karte ansehen</b></font>\nAuf der Karte sehen Sie ein Abbild der Route.\n\n<font color='#004C8C'><b>Navigation starten</b></font>\nSind Sie bereit aufzubrechen, beginnen Sie hier ihre Route.\n\[diese Funktion ist nicht umgesetzt\]</string>
     <string name="help_routes">Hier können Sie eine Auswahl treffen, welchen Weg Sie gehen möchten.\n\nDie Liste zeigt verschiedene Routen.\nUm mehr darüber zu erfahren, wählen Sie einen der Einträge durch antippen aus.</string>
     <string name="help_route_viewer">Hier ist ein Abbild der Strecke, die von Ihnen zu Ihrem Ziel führt.\nAnfang und Ende sind durch den roten Marker und die Zielflagge markiert.\n\n<font color='#519657'><b>\"Teilen\"-Knopf</b></font>\nSie können eine Vertrauensperson über Ihren Weg und Ihre Ankunftszeit informieren.\nTippen Sie auf den runden Knopf in der unteren rechten Ecke.\nDanach wählen Sie den Kontakt oder die Nachrichten-App zum Versenden des Bildes.\n\n<font color='#FF0000'>Achtung:</font> Beim Senden von Daten über das Internet können Kosten anfallen. Sprechen Sie dies bitte mit den verantwortlichen Personen ab.</string>
+    <string name="study_task_complete">Aufgabe geschafft!</string>
+    <string name="button_back_to_study_overview">zurück zur Übersicht</string>
+    <string name="button_start_task">Aufgabe starten</string>
+    <string name="study_intermission_fragment_title">Studien-Informationen</string>
 </resources>

@@ -82,6 +82,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
         val task = RoadGetter(this)
 
         viewModelScope.launch {
+            @Suppress("DEPRECATION")
             task.execute(waypoints, roadManager)
         }
     }
@@ -183,6 +184,11 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
             ""
         }
     }
+
+    // get ID of selected destination for study task check
+    fun getDestinationId(): Int {
+        return _destination?.id ?: -1
+    }
 }
 
 class RoutesViewModelFactory(private val application: Application, private val itemDao: ItemDao) :
@@ -196,6 +202,7 @@ class RoutesViewModelFactory(private val application: Application, private val i
     }
 }
 
+@Suppress("DEPRECATION")
 class RoadGetter(private val caller: RoutesViewModel) : AsyncTask<Any?, Void?, Array<Road>>() {
     // calculate roads in background
     @Suppress("UNCHECKED_CAST")

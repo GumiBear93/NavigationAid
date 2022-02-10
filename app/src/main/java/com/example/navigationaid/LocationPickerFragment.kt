@@ -19,9 +19,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentLocationPickerBinding
-import com.example.navigationaid.model.LocationFetchStatus
-import com.example.navigationaid.model.PlacesViewModel
-import com.example.navigationaid.model.PlacesViewModelFactory
+import com.example.navigationaid.model.*
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -39,6 +37,12 @@ class LocationPickerFragment : Fragment() {
         PlacesViewModelFactory(
             activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private val dataViewModel: StudyDataViewModel by activityViewModels {
+        StudyDataViewModelFactory(
+            activity?.application as NavigationAidApplication
         )
     }
 
@@ -198,6 +202,7 @@ class LocationPickerFragment : Fragment() {
 
         binding.apply {
             fabMyLocation.setOnClickListener {
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_FAB_LOCATION")
                 // user can fetch location or abort fetching, depending of the state of the operation
                 when (sharedViewModel.locationStatus.value) {
                     LocationFetchStatus.WAITING -> {
@@ -210,9 +215,11 @@ class LocationPickerFragment : Fragment() {
                 }
             }
             buttonConfirm.setOnClickListener {
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_BUT_CONFIRM")
                 confirmLocation()
             }
             buttonCancel.setOnClickListener {
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_BUT_CANCEL")
                 cancelUserInput()
             }
         }
@@ -232,6 +239,7 @@ class LocationPickerFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
+            dataViewModel.actionTrigger("${N_FRAGMENT}.${N_MEN_HELP}")
             sharedViewModel.showHelpDialog(
                 requireActivity(),
                 R.string.help_location_picker
@@ -251,5 +259,11 @@ class LocationPickerFragment : Fragment() {
         private const val OVERVIEW_ZOOM = 5.0
         private const val MAP_DEFAULT_LATITUDE = 50.0
         private const val MAP_DEFAULT_LONGITUDE = 10.0
+
+        private const val N_MEN_HELP = "HelpMenu"
+        private const val N_FRAGMENT = "LocationPickerFragment"
+        private const val N_BUT_CANCEL = "ButtonCancel"
+        private const val N_BUT_CONFIRM = "ButtonConfirm"
+        private const val N_FAB_LOCATION = "FabMyLocation"
     }
 }

@@ -172,7 +172,7 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) :
     }
 
     fun setPlaceName(name: String) {
-        _placeName.value = name
+        _placeName.value = name.trim()
     }
 
     fun setStatusFetching(isFetching: Boolean) {

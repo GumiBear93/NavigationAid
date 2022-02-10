@@ -11,24 +11,41 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@+id/image_logo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:src="@drawable/ic_logo"
             android:importantForAccessibility="no"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/button_my_places"/>
+            app:layout_constraintBottom_toTopOf="@id/button_bar"/>
 
-        <Button
-            android:id="@+id/button_my_places"
+        <LinearLayout
+            android:id="@+id/button_bar"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="@string/my_places"
-            android:minWidth="@dimen/button_width"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <Button
+                android:id="@+id/button_my_places"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="@string/my_places"
+                android:minWidth="@dimen/button_width" />
+
+            <Button
+                android:id="@+id/button_study_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="@string/start_study"
+                android:minWidth="@dimen/button_width"/>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

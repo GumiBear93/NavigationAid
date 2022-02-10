@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,7 +15,12 @@ import com.example.navigationaid.data.PlaceItem
 import com.example.navigationaid.databinding.PlaceItemViewBinding
 import java.io.File
 
-class PlacesAdapter(private val filesDir: File, private val title_add: String, private val title_edit: String) : ListAdapter<PlaceItem, PlacesAdapter.PlaceViewHolder>(DiffCallback) {
+class PlacesAdapter(private val filesDir: File, private val title_add: String, private val title_edit: String, private val itemClickListener: OnItemClickListener) : ListAdapter<PlaceItem, PlacesAdapter.PlaceViewHolder>(DiffCallback) {
+    // interface to return name of item clicked to fragment for data collection
+    interface OnItemClickListener {
+        fun onItemClicked(name: String)
+    }
+
     override fun getItemCount(): Int {
         //return number of places plus one for adding new places
         return currentList.size + 1
@@ -38,6 +44,7 @@ class PlacesAdapter(private val filesDir: File, private val title_add: String, p
             holder.imageView.setImageResource(R.drawable.ic_baseline_add_circle_24)
 
             holder.imageView.setOnClickListener {
+                itemClickListener.onItemClicked(holder.textView.text.toString())
                 val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(title_add)
                 it.findNavController().navigate(action)
             }
@@ -47,11 +54,13 @@ class PlacesAdapter(private val filesDir: File, private val title_add: String, p
 
             //clicking will open list of routes
             holder.itemView.setOnClickListener {
+                itemClickListener.onItemClicked(current.name)
                 val action = PlacesFragmentDirections.actionPlacesFragmentToRoutesFragment(current.id)
                 it.findNavController().navigate(action)
             }
             //long clicking will open editor of clicked place
             holder.itemView.setOnLongClickListener {
+                itemClickListener.onItemClicked("Edit${current.name}")
                 val action = PlacesFragmentDirections.actionPlacesFragmentToPlaceEditorFragment(title_edit, current.id)
                 it.findNavController().navigate(action)
                 true

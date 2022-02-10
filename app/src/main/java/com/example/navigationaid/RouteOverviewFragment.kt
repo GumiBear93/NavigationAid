@@ -12,6 +12,8 @@ import androidx.navigation.fragment.navArgs
 import com.example.navigationaid.databinding.FragmentRouteOverviewBinding
 import com.example.navigationaid.model.RoutesViewModel
 import com.example.navigationaid.model.RoutesViewModelFactory
+import com.example.navigationaid.model.StudyDataViewModel
+import com.example.navigationaid.model.StudyDataViewModelFactory
 
 
 class RouteOverviewFragment : Fragment() {
@@ -24,6 +26,12 @@ class RouteOverviewFragment : Fragment() {
         RoutesViewModelFactory(
             activity?.application as NavigationAidApplication,
             (activity?.application as NavigationAidApplication).database.itemDao()
+        )
+    }
+
+    private val dataViewModel: StudyDataViewModel by activityViewModels {
+        StudyDataViewModelFactory(
+            activity?.application as NavigationAidApplication
         )
     }
 
@@ -64,8 +72,22 @@ class RouteOverviewFragment : Fragment() {
         // open RouteViewer with selected route
         binding.apply {
             buttonOpenMap.setOnClickListener {
-                val action = RouteOverviewFragmentDirections.actionRouteOverviewFragmentToRouteViewerFragment()
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_BUT_OPEN_MAP")
+                val action =
+                    RouteOverviewFragmentDirections.actionRouteOverviewFragmentToRouteViewerFragment()
                 findNavController().navigate(action)
+            }
+            buttonStartNavigation.setOnClickListener {
+                dataViewModel.actionTrigger("$N_FRAGMENT.$N_BUT_START_NAVIGATION")
+                if (dataViewModel.checkCompletion(
+                        1,
+                        sharedViewModel.getDestinationId().toString()
+                    )
+                ) {
+                    val action =
+                        RouteOverviewFragmentDirections.actionRouteOverviewFragmentToStudyIntermissionFragment()
+                    findNavController().navigate(action)
+                }
             }
         }
 
@@ -79,6 +101,7 @@ class RouteOverviewFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.help_menu) {
+            dataViewModel.actionTrigger("${N_FRAGMENT}.${N_MEN_HELP}")
             sharedViewModel.showHelpDialog(
                 requireActivity(),
                 R.string.help_route_overview
@@ -87,5 +110,12 @@ class RouteOverviewFragment : Fragment() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val N_MEN_HELP = "HelpMenu"
+        private const val N_FRAGMENT = "RouteOverviewFragment"
+        private const val N_BUT_OPEN_MAP = "ButtonOpenMap"
+        private const val N_BUT_START_NAVIGATION = "ButtonStartNavigation"
     }
 }
