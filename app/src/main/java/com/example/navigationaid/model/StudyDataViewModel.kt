@@ -318,7 +318,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
 }
 
 class StudyDataViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StudyDataViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return StudyDataViewModel(application) as T

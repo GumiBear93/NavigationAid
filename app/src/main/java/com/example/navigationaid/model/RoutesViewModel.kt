@@ -91,7 +91,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
     fun onRoadTaskCompleted(roadList: Array<Road>) {
         if (roadList.size == 1 && roadList[0].mNodes.isEmpty()) {
             // default return values of RoadManager when error has occurred
-            _allRoads.value = null
+            _allRoads.value = arrayOf()
             _status.value = RouteApiStatus.ERROR
         } else {
             _allRoads.value = roadList
@@ -193,7 +193,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
 
 class RoutesViewModelFactory(private val application: Application, private val itemDao: ItemDao) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RoutesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return RoutesViewModel(application, itemDao) as T

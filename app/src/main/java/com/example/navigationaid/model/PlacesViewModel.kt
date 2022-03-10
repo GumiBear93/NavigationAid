@@ -216,7 +216,7 @@ class PlacesViewModel(application: Application, private val itemDao: ItemDao) :
 
 class PlacesViewModelFactory(val application: Application, private val itemDao: ItemDao) :
     ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return PlacesViewModel(application, itemDao) as T
