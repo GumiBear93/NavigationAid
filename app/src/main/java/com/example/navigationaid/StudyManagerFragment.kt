@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.navigationaid.databinding.FragmentStudyManagerBinding
@@ -14,6 +15,7 @@ import com.example.navigationaid.model.Gender
 import com.example.navigationaid.model.SendingState
 import com.example.navigationaid.model.StudyDataViewModel
 import com.example.navigationaid.model.StudyDataViewModelFactory
+import kotlinx.coroutines.launch
 
 
 class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener {
@@ -22,7 +24,8 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
 
     private val dataViewModel: StudyDataViewModel by activityViewModels {
         StudyDataViewModelFactory(
-            activity?.application as NavigationAidApplication
+            activity?.application as NavigationAidApplication,
+            (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 
@@ -123,6 +126,10 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
 
             buttonUpload.setOnClickListener {
                 dataViewModel.sendUserData()
+            }
+
+            buttonResetDatabase.setOnClickListener {
+                dataViewModel.prepareDataBase()
             }
 
             recyclerView.adapter = adapter

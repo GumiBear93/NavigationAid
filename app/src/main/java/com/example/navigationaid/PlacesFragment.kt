@@ -28,7 +28,8 @@ class PlacesFragment : Fragment(), PlacesAdapter.OnItemClickListener {
 
     private val dataViewModel: StudyDataViewModel by activityViewModels {
         StudyDataViewModelFactory(
-            activity?.application as NavigationAidApplication
+            activity?.application as NavigationAidApplication,
+            (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 

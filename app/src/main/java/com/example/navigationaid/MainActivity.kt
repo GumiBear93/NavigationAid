@@ -18,7 +18,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private val dataViewModel: StudyDataViewModel by viewModels {
         StudyDataViewModelFactory(
-            this.application as NavigationAidApplication
+            this.application as NavigationAidApplication,
+            (this.application as NavigationAidApplication).database.itemDao()
         )
     }
 

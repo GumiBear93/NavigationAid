@@ -15,4 +15,10 @@ interface ItemDao {
     fun getPlaceItem(id: Int): Flow<PlaceItem>
     @Query("SELECT * FROM placeItem ORDER BY id ASC")
     fun getPlaceItems(): Flow<List<PlaceItem>>
+    @Query("SELECT * FROM placeItem")
+    fun getStaticPlaceItems(): List<PlaceItem>
+    @Query("DELETE FROM placeItem")
+    fun nukeTable()
+    @Query("DELETE FROM sqlite_sequence WHERE name = 'placeItem'")
+    fun resetTableCounter()
 }

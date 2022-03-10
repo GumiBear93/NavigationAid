@@ -2,21 +2,21 @@
 <resources>
     <task id = "0" name = "saveNewPlace">
         <params>
-            <param0 name="placeName">zuhause</param0>
+            <param0 name="placeName">Heim</param0>
         </params>
-        <desc>Speicheren Sie ihren Aufenthaltsort ab</desc>
+        <desc>Speicheren Sie ihren Aufenthaltsort als "Heim" ab.</desc>
     </task>
     <task id = "1" name = "startNavigation">
         <params>
-            <param0 name="placeId">4</param0>
+            <param0 name="placeId">3</param0>
         </params>
-        <desc>Starten Sie die Navigation zum genannten Ort</desc>
+        <desc>Starten Sie die Navigation zum Geschäft "Rossmann".</desc>
     </task>
     <task id = "2" name = "editPlaceName">
         <params>
-            <param0 name="placeId">4</param0>
-            <param1 name="placeName">Roter Turm</param1>
+            <param0 name="placeId">1</param0>
+            <param1 name="placeName">Bäckerei</param1>
         </params>
-        <desc>Benennen Sie den genannten Ort um.</desc>
+        <desc>Berichtigen Sie den Namen der Bäckerei.</desc>
     </task>
 </resources>

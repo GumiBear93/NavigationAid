@@ -15,7 +15,7 @@ import com.example.navigationaid.data.RouteItem
 import com.example.navigationaid.data.toGeoPoint
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
-import okhttp3.internal.userAgent
+import org.osmdroid.config.Configuration
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -71,6 +71,7 @@ class RoutesViewModel(application: Application, private val itemDao: ItemDao) : 
     // launch asyncTask to calculate all routes with OSRMRoadManager
     fun getRoads() {
         val context = getApplication<Application>().applicationContext
+        val userAgent = Configuration.getInstance().userAgentValue
         val roadManager: RoadManager = OSRMRoadManager(context, userAgent)
 
         _endPoint = _destination!!.point.toGeoPoint()

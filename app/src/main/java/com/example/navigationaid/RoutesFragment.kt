@@ -43,7 +43,8 @@ class RoutesFragment : Fragment(), RoutesAdapter.OnItemClickListener {
 
     private val dataViewModel: StudyDataViewModel by activityViewModels {
         StudyDataViewModelFactory(
-            activity?.application as NavigationAidApplication
+            activity?.application as NavigationAidApplication,
+            (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 

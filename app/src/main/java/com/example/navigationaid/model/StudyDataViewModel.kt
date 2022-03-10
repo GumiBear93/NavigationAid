@@ -1,15 +1,19 @@
 package com.example.navigationaid.model
 
 import android.app.Application
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.JsonWriter
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.navigationaid.R
+import com.example.navigationaid.data.ItemDao
+import com.example.navigationaid.data.PlaceItem
+import com.example.navigationaid.data.PlaceItemRoomDatabase
 import com.example.navigationaid.data.TaskItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -17,10 +21,14 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.xmlpull.v1.XmlPullParser
+import java.io.File
+import java.io.FileOutputStream
 import java.io.StringWriter
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
-class StudyDataViewModel(application: Application) : AndroidViewModel(application) {
+class StudyDataViewModel(application: Application, private val itemDao: ItemDao) :
+    AndroidViewModel(application) {
     private var _loggingEnabled = false
     val loggingEnabled: Boolean get() = _loggingEnabled
 
@@ -30,13 +38,11 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
     private var _taskStartTime: Long = -1
 
     private val _actions = mutableListOf<ActionType>()
-    val actions: List<ActionType> get() = _actions
 
     private var _currentTask = StudyTask()
     val currentTask get() = _currentTask
 
     private val _tasks: MutableList<StudyTask> = parseTasks()
-    val tasks: List<StudyTask> get() = _tasks
 
     private var _studySubject: StudySubject? = null
     val studySubject: StudySubject? get() = _studySubject
@@ -62,7 +68,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
     fun prepareTask(taskId: Int) {
         if (_loggingEnabled) return
         Log.d(TAG, "prepareTask: preparing Task")
-        for (task in tasks) {
+        for (task in _tasks) {
             if (task.id == taskId) {
                 _currentTask = task
             }
@@ -271,7 +277,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
     fun sendActionData() {
         _actionDataState.value = SendingState.SENDING
         val actionDataOutput = StringWriter()
-        
+
         for (act in _actions) {
             JsonWriter(actionDataOutput).use { jsonWriter ->
                 jsonWriter.beginObject()
@@ -281,7 +287,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
                 jsonWriter.name("actiontime").value(act.actionTime)
                 jsonWriter.endObject()
             }
-            if(act != _actions.last()) {
+            if (act != _actions.last()) {
                 actionDataOutput.append("*")
             }
         }
@@ -310,18 +316,69 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
         _allowBackPress = allow
     }
 
+    fun prepareDataBase() {
+        val context = getApplication<Application>().applicationContext
+        runBlocking(Dispatchers.IO) {
+            val allPlaceItems = itemDao.getStaticPlaceItems()
+            for (pItem in allPlaceItems) {
+                val file = File(context.filesDir, pItem.imageName)
+                if (file.exists()) {
+                    file.delete()
+                }
+            }
+            itemDao.nukeTable()
+            itemDao.resetTableCounter()
+            Log.d(TAG, "prepareDataBase: Database reset")
+        }
+
+        for (place in 0..2) {
+            val img = BitmapFactory.decodeResource(context.resources, imagesPlaces[place])
+            val fileName = "Studie$place"
+            try {
+                val fos: FileOutputStream = context.openFileOutput(fileName, Context.MODE_PRIVATE)
+                img.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            } catch (e: Exception) {
+                Log.d(TAG, e.toString())
+            }
+
+            val item = PlaceItem(
+                name = namesPlaces[place],
+                point = pointsPlaces[place],
+                imageName = fileName
+            )
+
+            runBlocking(Dispatchers.IO) {
+                itemDao.insert(item)
+            }
+            Log.d(TAG, "prepareDataBase: prepared place ${place + 1}")
+        }
+
+        Toast.makeText(context, "Datenbank vorbereitet", Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         private const val TAG = "StudyDataViewModel"
         private const val DB_URL = "https://www-user.tu-chemnitz.de/~flthu/navigationaid/api"
         private val JSON = "application/json".toMediaTypeOrNull()
+        private val namesPlaces = listOf("Bääckeri", "Lidl", "Rossmann")
+        private val pointsPlaces = listOf(
+            "50.8350215,12.886006,0.0",
+            "50.8333567,12.8753004,0.0",
+            "50.8311811,12.8937353,0.0"
+        )
+        private val imagesPlaces =
+            listOf(R.drawable.baeckerei, R.drawable.lidl, R.drawable.rossmann)
     }
 }
 
-class StudyDataViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+class StudyDataViewModelFactory(
+    private val application: Application,
+    private val itemDao: ItemDao
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StudyDataViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return StudyDataViewModel(application) as T
+            return StudyDataViewModel(application, itemDao) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

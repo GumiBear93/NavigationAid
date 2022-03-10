@@ -354,6 +354,16 @@
                 tools:listitem="@layout/task_item_view" />
 
             <Button
+                android:id="@+id/button_reset_database"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="@dimen/button_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_between_elements"
+                android:text="@string/button_reset_database"
+                android:textColor="@color/red" />
+
+            <Button
                 android:id="@+id/button_end_study"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="@dimen/button_width"

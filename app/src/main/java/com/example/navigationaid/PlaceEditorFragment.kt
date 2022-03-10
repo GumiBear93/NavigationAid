@@ -46,7 +46,8 @@ class PlaceEditorFragment : Fragment() {
 
     private val dataViewModel: StudyDataViewModel by activityViewModels {
         StudyDataViewModelFactory(
-            activity?.application as NavigationAidApplication
+            activity?.application as NavigationAidApplication,
+            (activity?.application as NavigationAidApplication).database.itemDao()
         )
     }
 
