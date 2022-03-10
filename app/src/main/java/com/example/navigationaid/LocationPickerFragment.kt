@@ -105,6 +105,7 @@ class LocationPickerFragment : Fragment() {
                     if (location != null) {
                         mapController.animateTo(GeoPoint(location))
                         mapController.setZoom(DETAIL_ZOOM)
+                        dataViewModel.actionTrigger("$N_FRAGMENT.$N_EVT_LOC_FOUND")
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -265,5 +266,6 @@ class LocationPickerFragment : Fragment() {
         private const val N_BUT_CANCEL = "ButtonCancel"
         private const val N_BUT_CONFIRM = "ButtonConfirm"
         private const val N_FAB_LOCATION = "FabMyLocation"
+        private const val N_EVT_LOC_FOUND = "EventLocationFound"
     }
 }

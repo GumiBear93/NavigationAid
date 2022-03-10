@@ -54,7 +54,6 @@
     <string name="delete_confirmation_message">Löschen eines Ortes kann nicht rückgängig gemacht werden. Bist du sicher?</string>
     <string name="start_study">Studie starten</string>
     <string name="study_label_id">ID</string>
-    <string name="study_label_name">Name</string>
     <string name="study_label_age">Alter</string>
     <string name="study_label_gender">Geschlecht</string>
     <string name="study_label_male_gender">Männlich</string>

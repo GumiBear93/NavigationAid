@@ -3,14 +3,24 @@ package com.example.navigationaid
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.navigationaid.model.StudyDataViewModel
+import com.example.navigationaid.model.StudyDataViewModelFactory
 import org.osmdroid.config.Configuration
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private lateinit var navController: NavController
+
+    private val dataViewModel: StudyDataViewModel by viewModels {
+        StudyDataViewModelFactory(
+            this.application as NavigationAidApplication
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +37,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    override fun onBackPressed() {
+        if (dataViewModel.allowBackPress) super.onBackPressed()
     }
 
     // shows Help-Symbol on each screen for user support

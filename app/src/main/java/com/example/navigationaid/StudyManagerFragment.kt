@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.navigationaid.databinding.FragmentStudyManagerBinding
 import com.example.navigationaid.model.Gender
+import com.example.navigationaid.model.SendingState
 import com.example.navigationaid.model.StudyDataViewModel
 import com.example.navigationaid.model.StudyDataViewModelFactory
 
@@ -25,6 +26,18 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
         )
     }
 
+    private fun toggleButtonState(active: Boolean) {
+        binding.buttonUpload.apply {
+            if (active) {
+                alpha = 1.0f
+                isClickable = true
+            } else {
+                alpha = 0.5f
+                isClickable = false
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +50,8 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setMenuVisibility(false)
+
         val adapter = StudyManagerAdapter(dataViewModel, this)
 
         dataViewModel.studyInProgress.observe(this.viewLifecycleOwner) {
@@ -46,8 +61,7 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
                     layoutEntryForm.visibility = View.GONE
 
                     if(dataViewModel.studySubject != null) {
-                        textId.text = dataViewModel.studySubject!!.subjectId
-                        textName.text = dataViewModel.studySubject!!.subjectName
+                        textId.text = dataViewModel.studySubject!!.subjectId.toString()
                         textAge.text = dataViewModel.studySubject!!.subjectAge.toString()
                         textGender.text = when (dataViewModel.studySubject!!.subjectGender) {
                             Gender.MALE -> getString(R.string.study_label_male_gender)
@@ -64,10 +78,26 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
             }
         }
 
+        dataViewModel.userDataState.observe(this.viewLifecycleOwner) {
+            when (it) {
+                SendingState.WAITING -> {
+                    binding.imageUpload.visibility = View.INVISIBLE
+                    toggleButtonState(true)
+                }
+                SendingState.SENDING -> {
+                    binding.imageUpload.visibility = View.INVISIBLE
+                    toggleButtonState(false)
+                }
+                else -> { //DONE
+                    binding.imageUpload.visibility = View.VISIBLE
+                    toggleButtonState(false)
+                }
+            }
+        }
+
         binding.apply {
             buttonConfirm.setOnClickListener {
                 val id = binding.idInput.text.toString()
-                val name = binding.nameInput.text.toString()
                 val age = binding.ageInput.text.toString()
                 val gender = when (binding.genderOptions.checkedRadioButtonId) {
                     binding.genderMale.id -> Gender.MALE
@@ -77,7 +107,7 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
                 val frequency = binding.sliderFrequency.value.toInt()
                 val variety = binding.sliderVariety.value.toInt()
 
-                dataViewModel.setStudySubject(id, name, age, gender, frequency, variety)
+                dataViewModel.setStudySubject(id, age, gender, frequency, variety)
             }
 
             buttonCancel.setOnClickListener {
@@ -89,6 +119,10 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
                 dataViewModel.stopStudy()
                 val action = StudyManagerFragmentDirections.actionStudyManagerFragmentToHomeFragment()
                 findNavController().navigate(action)
+            }
+
+            buttonUpload.setOnClickListener {
+                dataViewModel.sendUserData()
             }
 
             recyclerView.adapter = adapter
@@ -107,9 +141,5 @@ class StudyManagerFragment : Fragment(), StudyManagerAdapter.OnTaskClickListener
         dataViewModel.prepareTask(taskId)
         val  action = StudyManagerFragmentDirections.actionStudyManagerFragmentToStudyIntermissionFragment()
         findNavController().navigate(action)
-    }
-
-    companion object {
-
     }
 }

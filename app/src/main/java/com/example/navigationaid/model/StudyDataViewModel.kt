@@ -1,12 +1,24 @@
 package com.example.navigationaid.model
 
 import android.app.Application
+import android.util.JsonWriter
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.example.navigationaid.R
 import com.example.navigationaid.data.TaskItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.xmlpull.v1.XmlPullParser
+import java.io.StringWriter
+import java.util.concurrent.TimeUnit
 
 class StudyDataViewModel(application: Application) : AndroidViewModel(application) {
     private var _loggingEnabled = false
@@ -29,7 +41,23 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
     private var _studySubject: StudySubject? = null
     val studySubject: StudySubject? get() = _studySubject
 
-    private var abortCounter: Int = 0
+    private var _abortCounter: Int = 0
+
+    private val _userDataState = MutableLiveData(SendingState.WAITING)
+    val userDataState: LiveData<SendingState> get() = _userDataState
+
+    private val _actionDataState = MutableLiveData(SendingState.WAITING)
+    val actionDataState: LiveData<SendingState> get() = _actionDataState
+
+    private var _allowBackPress = true
+    val allowBackPress get() = _allowBackPress
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(AddHeaderInterceptor())
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(40, TimeUnit.SECONDS)
+        .connectTimeout(40, TimeUnit.SECONDS)
+        .build()
 
     fun prepareTask(taskId: Int) {
         if (_loggingEnabled) return
@@ -49,34 +77,32 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setStudySubject(
         id: String,
-        name: String,
         age: String,
         gender: Gender,
         frequency: Int,
         variety: Int
     ): Boolean {
-        return if (isEntryValid(id, name, age)) {
-            prepareStudy(id.trim(), name.trim(), age.toInt(), gender, frequency, variety)
+        return if (isEntryValid(id, age)) {
+            prepareStudy(id.toInt(), age.toInt(), gender, frequency, variety)
             true
         } else {
             false
         }
     }
 
-    private fun isEntryValid(id: String, name: String, age: String): Boolean {
-        return (id.isNotBlank() && name.isNotBlank() && age.isNotBlank())
+    private fun isEntryValid(id: String, age: String): Boolean {
+        return (id.isNotBlank() && age.isNotBlank())
     }
 
     private fun prepareStudy(
-        id: String,
-        name: String,
+        id: Int,
         age: Int,
         gender: Gender,
         frequency: Int,
         variety: Int
     ) {
         Log.d(TAG, "prepareStudy: preparing study subject")
-        val subject = StudySubject(id, name, age, gender, frequency, variety)
+        val subject = StudySubject(id, age, gender, frequency, variety)
         _studySubject = subject
         _studyInProgress.value = true
     }
@@ -91,7 +117,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
 
         val newAction = ActionType()
         newAction.actionName = filteredIdentifier
-        newAction.actionTime = timestamp
+        newAction.actionTime = (timestamp.toFloat() / 1000)
 
         _actions.add(newAction)
     }
@@ -129,7 +155,7 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
                         eventType = parser.next()
                     }
                     eventType = parser.next()
-                    if(eventType == XmlPullParser.TEXT) {
+                    if (eventType == XmlPullParser.TEXT) {
                         val newDescription = parser.text
                         newTask.desc = newDescription
                     }
@@ -162,6 +188,8 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
         Log.d(TAG, "stopStudy: Study stopped")
         _studySubject = null
         _studyInProgress.value = false
+        _userDataState.value = SendingState.WAITING
+        _actionDataState.value = SendingState.WAITING
         resetTaskData()
     }
 
@@ -171,26 +199,30 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
         _actions.clear()
         _currentTask = StudyTask()
         _loggingEnabled = false
-        abortCounter = 0
+        _abortCounter = 0
+        _actionDataState.value = SendingState.WAITING
     }
 
     fun abortTask(): Boolean {
         if (!_loggingEnabled) return false
 
         val context = getApplication<Application>().applicationContext
-        if (abortCounter >= 5) {
+        if (_abortCounter >= 5) {
             Toast.makeText(context, "task aborted", Toast.LENGTH_SHORT).show()
             resetTaskData()
             return true
         } else {
-            abortCounter++
+            _abortCounter++
             return false
         }
     }
 
     fun getTaskButtonLabel(taskId: Int): String {
         val context = getApplication<Application>().applicationContext
-        return context.resources.getString(R.string.button_start_task_number, (taskId + 1).toString())
+        return context.resources.getString(
+            R.string.button_start_task_number,
+            (taskId + 1).toString()
+        )
     }
 
     fun getTaskItems(): List<TaskItem> {
@@ -202,8 +234,86 @@ class StudyDataViewModel(application: Application) : AndroidViewModel(applicatio
         return taskItems
     }
 
+    fun sendUserData() {
+        _userDataState.value = SendingState.SENDING
+
+        val userDataOutput = StringWriter()
+        JsonWriter(userDataOutput).use { jsonWriter ->
+            jsonWriter.beginObject()
+            jsonWriter.name("id").value(_studySubject!!.subjectId)
+            jsonWriter.name("age").value(_studySubject!!.subjectAge)
+            jsonWriter.name("gender").value(_studySubject!!.subjectGender.name)
+            jsonWriter.name("frequency").value(_studySubject!!.frequency)
+            jsonWriter.name("variety").value(_studySubject!!.variety)
+            jsonWriter.endObject()
+        }
+
+        val call = client.newCall(
+            Request.Builder()
+                .url("$DB_URL/createuser.php")
+                .method("POST", userDataOutput.toString().toRequestBody(JSON))
+                .build()
+        )
+
+        val response: Response
+        runBlocking {
+            response = withContext(Dispatchers.Default) {
+                call.execute()
+            }
+        }
+        _userDataState.value = if (response.isSuccessful) {
+            SendingState.DONE
+        } else {
+            SendingState.WAITING
+        }
+    }
+
+    fun sendActionData() {
+        _actionDataState.value = SendingState.SENDING
+        val actionDataOutput = StringWriter()
+        
+        for (act in _actions) {
+            JsonWriter(actionDataOutput).use { jsonWriter ->
+                jsonWriter.beginObject()
+                jsonWriter.name("user_id").value(_studySubject!!.subjectId)
+                jsonWriter.name("task_id").value(_currentTask.id)
+                jsonWriter.name("actionname").value(act.actionName)
+                jsonWriter.name("actiontime").value(act.actionTime)
+                jsonWriter.endObject()
+            }
+            if(act != _actions.last()) {
+                actionDataOutput.append("*")
+            }
+        }
+
+        val call = client.newCall(
+            Request.Builder()
+                .url("$DB_URL/createdata.php")
+                .method("POST", actionDataOutput.toString().toRequestBody(JSON))
+                .build()
+        )
+
+        val response: Response
+        runBlocking {
+            response = withContext(Dispatchers.Default) {
+                call.execute()
+            }
+        }
+        _actionDataState.value = if (response.isSuccessful) {
+            SendingState.DONE
+        } else {
+            SendingState.WAITING
+        }
+    }
+
+    fun allowBackPress(allow: Boolean) {
+        _allowBackPress = allow
+    }
+
     companion object {
-        const val TAG = "StudyDataViewModel"
+        private const val TAG = "StudyDataViewModel"
+        private const val DB_URL = "https://www-user.tu-chemnitz.de/~flthu/navigationaid/api"
+        private val JSON = "application/json".toMediaTypeOrNull()
     }
 }
 
@@ -226,16 +336,27 @@ class StudyTask {
 
 class ActionType {
     var actionName = ""
-    var actionTime: Long = 0
+    var actionTime: Float = 0.0f
 }
 
 enum class Gender { MALE, FEMALE, DIVERSE }
 
 class StudySubject(
-    val subjectId: String,
-    val subjectName: String,
+    val subjectId: Int,
     val subjectAge: Int,
     val subjectGender: Gender,
     val frequency: Int,
     val variety: Int
 )
+
+enum class SendingState { WAITING, SENDING, DONE }
+
+class AddHeaderInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        return chain.proceed(
+            chain.request().newBuilder()
+                .header("X-Requested-With", "XMLHttpRequest")
+                .build()
+        )
+    }
+}

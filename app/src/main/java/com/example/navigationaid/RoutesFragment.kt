@@ -184,6 +184,7 @@ class RoutesFragment : Fragment(), RoutesAdapter.OnItemClickListener {
                 if(it.isNotEmpty()) {
                     Log.d(LOG_TAG, "onViewCreated: List submitted")
                     adapter.submitList(it)
+                    dataViewModel.actionTrigger("$N_FRAGMENT.$N_EVT_ROUTES_CALC")
                 }
             }
         }
@@ -224,5 +225,6 @@ class RoutesFragment : Fragment(), RoutesAdapter.OnItemClickListener {
         private const val N_MEN_HELP = "HelpMenu"
         private const val N_FRAGMENT = "RoutesFragment"
         private const val N_BUT_ROUTE = "Route"
+        private const val N_EVT_ROUTES_CALC = "EventRoutesCalculated"
     }
 }
